@@ -1,123 +1,160 @@
+// app/page.tsx
+
 import Link from "next/link";
-import Image from "next/image";
-import { Search, MapPin, CheckCircle, UserPlus } from "lucide-react";
-import pict from "@/public/pict.jpg"
+import {
+  Search,
+  ShieldCheck,
+  User,
+  Home as HomeIcon,
+} from "lucide-react";
 
-// Interface for type safety
-interface Listing {
-  id: number;
+// --- REUSABLE COMPONENTS ---
+
+const FeatureCard = ({
+  icon,
+  title,
+  description,
+}: {
+  icon: React.ReactNode;
   title: string;
-  location: string;
-  price: string;
-  type: string;
-  img: string;
-}
+  description: string;
+}) => (
+  <div className="p-6 text-center bg-white rounded-2xl shadow-lg border border-neutral-200/80 transform hover:-translate-y-2 transition-transform duration-300 group">
+    <div className="flex items-center justify-center h-16 w-16 rounded-2xl bg-gradient-to-br from-teal-100 to-amber-100 mx-auto mb-4 transition-transform duration-300 group-hover:scale-110">
+      {icon}
+    </div>
+    <h3 className="mt-4 text-lg font-bold text-neutral-800">{title}</h3>
+    <p className="mt-2 text-sm text-neutral-600">{description}</p>
+  </div>
+);
 
-// Placeholder data for popular listings
-const popularListings: Listing[] = [
-  { id: 1, title: "Modern PG for Students", location: "FC Road, Pune", price: "9,500", type: "PG", img: "https://imgs.unsplash.com/photo-1585573759322-38688e14a7c3?q=80&w=2070" },
-  { id: 2, title: "Spacious 2BHK Flat", location: "Viman Nagar, Pune", price: "22,000", type: "Flat", img: "https://imgs.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1980" },
-  { id: 3, title: "Budget-Friendly Hostel", location: "Kothrud, Pune", price: "7,000", type: "Hostel", img: "https://imgs.unsplash.com/photo-1608198399980-87185594b6a9?q=80&w=2070" },
+// --- DATA ---
+const features = [
+  {
+    icon: <User className="h-8 w-8 text-teal-600" />,
+    title: "For Students, By Students",
+    description: "Focused on the real needs of PICT, BVCOE, and other Pune South students.",
+  },
+  {
+    icon: <ShieldCheck className="h-8 w-8 text-teal-600" />,
+    title: "Safe & Verified",
+    description: "We encourage verified landlords and provide safety tips for newcomers in Katraj & Dhankawadi.",
+  },
+  {
+    icon: <Search className="h-8 w-8 text-teal-600" />,
+    title: "Smart Search",
+    description: "Filter by PGs, hostels, or shared flats—find exactly what suits your student budget.",
+  },
+  {
+    icon: <HomeIcon className="h-8 w-8 text-teal-600" />,
+    title: "Hyperlocal Focus",
+    description: "All listings are from Katraj, Dhankawadi, and nearby student hubs.",
+  },
 ];
+
+// --- HOME PAGE COMPONENT ---
 
 export default function Home() {
   return (
-    <>
-      <main className="bg-white">
-        {/* New Split-Screen Hero Section */}
-        <section className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center py-20 px-4">
-          <div className="text-center lg:text-left">
-            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight">
-              Find Your <span className="text-blue-600">Student Home</span> in Pune
-            </h1>
-            <p className="mt-6 text-lg text-gray-600 max-w-lg mx-auto lg:mx-0">
-              The easiest way for college students to find verified PGs, flats, hostels, and roommates near campus.
+    <main className="bg-neutral-50 text-neutral-800">
+      {/* Hero Section */}
+      <section className="relative min-h-[70vh] flex items-center justify-center py-16 md:py-24">
+        {/* Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-teal-50 via-white to-amber-50 -z-10" />
+
+        {/* Content */}
+        <div className="max-w-4xl w-full mx-auto text-center px-4 sm:px-6">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-6 text-neutral-900">
+            Find Your Perfect
+            <span className="block mt-2 bg-gradient-to-r from-teal-500 to-cyan-500 bg-clip-text text-transparent">
+              Student Home
+            </span>
+          </h1>
+          <p className="text-lg sm:text-xl text-neutral-600 max-w-2xl mx-auto mb-10">
+            Rentify helps college students around PICT & BVCOE find verified PGs, flats, and roommates in the Katraj & Dhankawadi area.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Link
+              href="/listings"
+              className="inline-flex items-center justify-center px-8 py-3 text-base font-semibold rounded-full text-white bg-teal-600 hover:bg-teal-700 transform hover:scale-105 shadow-lg transition-all duration-300"
+            >
+              Start Your Search
+            </Link>
+            <Link
+              href="/listings/add"
+              className="inline-flex items-center justify-center px-8 py-3 text-base font-semibold rounded-full text-teal-700 bg-white hover:bg-teal-50 ring-2 ring-inset ring-teal-200 shadow-md transform hover:scale-105 transition-all duration-300"
+            >
+              List a Property
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-16 md:py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <h2 className="text-base text-teal-600 font-semibold tracking-wide uppercase">
+              Why Choose Us?
+            </h2>
+            <p className="mt-2 text-3xl md:text-4xl font-extrabold tracking-tight text-neutral-900">
+              Your Student Housing Search, Simplified
             </p>
-            {/* Search Bar */}
-            <div className="mt-8 w-full max-w-md mx-auto lg:mx-0 bg-white border border-gray-300 rounded-full shadow-sm flex items-center p-2">
-              <MapPin className="text-gray-400 mx-3" size={20} />
-              <input type="text" placeholder="Search a location..." className="w-full text-base outline-none border-none bg-transparent text-gray-700"/>
-              <button className="bg-blue-600 text-white rounded-full p-2.5 hover:bg-blue-700 transition-colors">
-                <Search size={20} />
-              </button>
-            </div>
+            <p className="mt-4 max-w-2xl text-lg text-neutral-600 mx-auto">
+              We&aposre built by local students, for local students. We know what you need because we&aposve been there.
+            </p>
           </div>
-          <div className="hidden lg:block">
-            <div className="relative h-96 w-full rounded-2xl overflow-hidden shadow-xl">
-              <Image
-                src={pict}
-                alt="Modern apartment background"
-                fill
-                className="object-cover"
-                priority
-              />
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {features.map((feature) => (
+              <FeatureCard key={feature.title} {...feature} />
+            ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* How It Works Section */}
-        <section className="bg-gray-50 py-20">
-          <div className="max-w-7xl mx-auto px-4 text-center">
-             <h2 className="text-3xl font-bold text-gray-800 mb-2">How It Works</h2>
-             <p className="text-gray-500 mb-12">Find your perfect place in three simple steps.</p>
-             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="p-6">
-                   <Search size={40} className="mx-auto text-blue-600 mb-4"/>
-                   <h3 className="font-bold text-xl mb-2">Search & Filter</h3>
-                   <p className="text-gray-600">Easily search by location and filter by price and type to find exactly what you need.</p>
-                </div>
-                 <div className="p-6">
-                   <UserPlus size={40} className="mx-auto text-blue-600 mb-4"/>
-                   <h3 className="font-bold text-xl mb-2">Connect & Visit</h3>
-                   <p className="text-gray-600">Contact owners directly or connect with potential roommates to schedule visits.</p>
-                </div>
-                 <div className="p-6">
-                   <CheckCircle size={40} className="mx-auto text-blue-600 mb-4"/>
-                   <h3 className="font-bold text-xl mb-2">Secure Your Place</h3>
-                   <p className="text-gray-600">Finalize your choice and move into your new student home with confidence.</p>
-                </div>
-             </div>
-          </div>
-        </section>
-
-        {/* Popular Listings Section */}
-        <section className="bg-white py-20 px-4">
-          <div className="max-w-7xl mx-auto">
-            <h2 className="text-3xl font-bold text-center text-gray-800 mb-2">Popular Listings in Pune</h2>
-            <p className="text-center text-gray-500 mb-12">Get a glimpse of the best places to stay, recommended by students.</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {popularListings.map((listing) => (
-                <Link href={`/listings/${listing.id}`} key={listing.id} className="group block bg-white rounded-xl shadow-md overflow-hidden transition-transform transform hover:-translate-y-2 hover:shadow-xl">
-                  <div className="relative h-56 w-full">
-                    <Image
-                      src={listing.img}
-                      alt={listing.title}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    />
-                    <span className="absolute top-4 left-4 bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full">{listing.type}</span>
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">{listing.title}</h3>
-                    <p className="flex items-center text-gray-500 mb-4">
-                      <MapPin size={16} className="mr-2" /> {listing.location}
-                    </p>
-                    <p className="text-2xl font-extrabold text-blue-600">
-                      ₹{listing.price} <span className="text-base font-medium text-gray-500">/ month</span>
-                    </p>
-                  </div>
-                </Link>
-              ))}
+      {/* How It Works Section */}
+      <section className="bg-neutral-50 py-16 md:py-24">
+        <div className="max-w-7xl mx-auto px-4 text-center">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-neutral-900 mb-4">
+            How It Works
+          </h2>
+          <p className="text-lg text-neutral-600 mb-16">
+            Find your perfect place in three simple steps.
+          </p>
+          <div className="relative grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Dashed line for desktop */}
+            <div className="hidden md:block absolute top-12 left-0 w-full h-px pointer-events-none">
+              <svg width="100%" height="2">
+                <line x1="0" y1="1" x2="100%" y2="1" stroke="#d4d4d4" strokeWidth="2" strokeDasharray="8 8" />
+              </svg>
             </div>
-            <div className="text-center mt-12">
-              <Link href="/listings" className="px-8 py-3 border border-blue-600 text-blue-600 rounded-full font-semibold hover:bg-blue-600 hover:text-white transition-all">
-                View All Listings
-              </Link>
-            </div>
+            {/* Steps */}
+            {[{
+              label: "Search & Filter",
+              desc: "Use our smart filters to narrow down properties by price, location, and type.",
+            },
+            {
+              label: "Connect & Visit",
+              desc: "Directly contact owners or find potential roommates to schedule viewings.",
+            },
+            {
+              label: "Secure Your Place",
+              desc: "Finalize your choice and move into your new student home with confidence.",
+            }].map((step, idx) => (
+              <div
+                key={step.label}
+                className="relative bg-white rounded-xl p-6 border border-neutral-200 shadow-md z-10 transform hover:-translate-y-1 transition duration-300"
+              >
+                <div className="flex items-center justify-center w-16 h-16 mx-auto mb-5 bg-gradient-to-br from-teal-200 to-amber-200 text-teal-800 rounded-full border-4 border-white font-bold text-2xl shadow-sm">
+                  {idx + 1}
+                </div>
+                <h3 className="font-bold text-xl mb-2 text-neutral-800">{step.label}</h3>
+                <p className="text-neutral-600 text-base">{step.desc}</p>
+              </div>
+            ))}
           </div>
-        </section>
-      </main>
-    </>
+        </div>
+      </section>
+    </main>
   );
 }

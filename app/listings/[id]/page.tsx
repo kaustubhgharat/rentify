@@ -1,137 +1,138 @@
-import { MapPin, Phone, Wifi, ParkingCircle, UtensilsCrossed, AirVent } from 'lucide-react';
-import { notFound } from 'next/navigation';
-import Image from 'next/image';
-import { ReactElement } from 'react';
+import { notFound } from "next/navigation";
+import Image from "next/image";
+import { IListing } from "@/types";
+import { 
+  MapPin, Phone, Mail, Wifi, Bed, AirVent, ParkingCircle, 
+  UtensilsCrossed, Table, WashingMachine, ShieldCheck, Wrench
+} from "lucide-react";
+import { ReactElement } from "react";
 
-// --- TYPE DEFINITIONS ---
-interface Amenity {
-  name: string;
-  icon: string; // Storing icon name as a string is better practice
+async function getListing(id: string): Promise<IListing | null> {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/listings/${id}`, {
+      cache: 'no-store'
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.listing;
+  } catch (error) {
+    console.error("Failed to fetch listing:", error);
+    return null;
+  }
 }
 
-interface Listing {
-  id: string;
-  title: string;
-  price: number;
-  location: string;
-  type: string;
-  images: string[];
-  description: string;
-  amenities: Amenity[];
-  contact: {
-    name: string;
-    phone: string;
+export default async function ListingDetailPage({ params }: { params: { id: string } }) {
+  const listing = await getListing(params.id);
+
+  if (!listing) {
+    notFound();
+  }
+  
+  const amenityIcons: { [key: string]: ReactElement } = {
+    wifi: <Wifi size={20} />,
+    ac: <AirVent size={20} />,
+    food: <UtensilsCrossed size={20} />,
+    parking: <ParkingCircle size={20} />,
+    bed: <Bed size={20} />,
+    table: <Table size={20} />,
+    washingMachine: <WashingMachine size={20} />,
   };
-  mapSrc: string;
-}
-
-// --- MOCK DATA FETCH FUNCTION ---
-async function getListingData(id: string): Promise<Listing | undefined> {
-    const mockListing: Listing = {
-        id: "1",
-        title: "Modern Hostel near PICT, Pune",
-        price: 8500,
-        location: "Dhankawadi, Pune",
-        type: "Hostel",
-        images: ["/hostel1.jpg", "/flat1.jpg", "/pg1.jpg", "/hostel1.jpg"],
-        description: "A clean and modern hostel designed for students of PICT and nearby colleges. Features high-speed Wi-Fi, optional daily meals, and 24/7 security. Located just a 5-minute walk from the main campus.",
-        amenities: [
-            { icon: "Wifi", name: "High-Speed WiFi" },
-            { icon: "UtensilsCrossed", name: "Mess Available" },
-            { icon: "ParkingCircle", name: "2-Wheeler Parking" },
-            { icon: "AirVent", name: "Air Conditioning" }
-        ],
-        contact: {
-            name: "Mr. Sharma",
-            phone: "+91 98765 43210"
-        },
-        // Real Google Maps Embed URL for PICT, Pune
-        mapSrc: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3784.133285149337!2d73.85040337588118!3d18.47729107021727!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc2eac92b860ce1%3A0x33b353175b3de8f0!2sPune%20Institute%20of%20Computer%20Technology!5e0!3m2!1sen!2sin!4v1678257009852!5m2!1sen!2sin"
-    };
-
-    if (id !== "1") return undefined; // Simulate finding only one listing
-    return mockListing;
-}
-
-// --- COMPONENT ---
-export default async function ListingDetail({ params }: { params: { id: string } }) {
-    const listing = await getListingData(params.id);
-    if (!listing) {
-        notFound();
-    }
+  
+  const availableAmenities = Object.entries(listing.amenities)
+    .filter(([, value]) => value === true)
+    .map(([key]) => key);
     
-    // Map string identifiers to actual icon components
-    const iconMap: { [key: string]: ReactElement } = {
-        Wifi: <Wifi />,
-        UtensilsCrossed: <UtensilsCrossed />,
-        ParkingCircle: <ParkingCircle />,
-        AirVent: <AirVent />
-    };
+  // ✨ FIX: Using the variable name with the required NEXT_PUBLIC_ prefix
+const mapEmbedUrl = `https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY}&q=${encodeURIComponent(listing.address)}`;
 
-    return (
-        <main className="bg-white">
-            <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-                {/* Header: Title & Location */}
-                <div>
-                    <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">{listing.title}</h1>
-                    <p className="mt-2 flex items-center text-lg text-gray-500">
-                        <MapPin size={20} className="mr-2" /> {listing.location}
-                    </p>
-                </div>
+  return (
+    <main className="bg-neutral-50">
+      <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        {/* Header: Title & Location */}
+        <div className="mb-8">
+          <span className="text-sm font-semibold text-teal-600 bg-teal-100 px-3 py-1 rounded-full">{listing.listingType}</span>
+          <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-neutral-900 sm:text-4xl">{listing.title}</h1>
+          <p className="mt-2 flex items-center text-lg text-neutral-500">
+            <MapPin size={20} className="mr-2 flex-shrink-0" /> {listing.address}
+          </p>
+        </div>
 
-                {/* Image Gallery */}
-                <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4 h-96">
-                    <div className="relative col-span-2 row-span-2">
-                        <Image src={listing.images[0]} alt="Main listing view" fill className="object-cover rounded-lg" priority sizes="(max-width: 768px) 100vw, 50vw"/>
-                    </div>
-                    {listing.images.slice(1, 4).map((img, index) => (
-                        <div key={img + index} className="relative hidden md:block">
-                            <Image src={img} alt={`Listing view ${index + 2}`} fill className="object-cover rounded-lg" sizes="25vw"/>
-                        </div>
-                    ))}
-                </div>
-
-                {/* Main Content */}
-                <div className="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-12">
-                    <div className="lg:col-span-2">
-                        <h2 className="text-2xl font-bold text-gray-800 border-b pb-4">About this place</h2>
-                        <p className="mt-4 text-gray-600 leading-relaxed">{listing.description}</p>
-                        
-                        <h3 className="text-xl font-bold text-gray-800 mt-8">Amenities</h3>
-                        <div className="mt-4 grid grid-cols-2 gap-4">
-                            {listing.amenities.map(amenity => (
-                                <div key={amenity.name} className="flex items-center text-gray-700">
-                                    <span className="text-blue-600">{iconMap[amenity.icon]}</span>
-                                    <span className="ml-3">{amenity.name}</span>
-                                </div>
-                            ))}
-                        </div>
-
-                        <h3 className="text-xl font-bold text-gray-800 mt-8">Location</h3>
-                        <div className="mt-4 rounded-lg overflow-hidden border">
-                            <iframe src={listing.mapSrc} width="100%" height="450" style={{ border: 0 }} allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
-                        </div>
-                    </div>
-                    
-                    {/* Sticky Contact Card */}
-                    <aside className="lg:col-span-1">
-                        <div className="sticky top-24 bg-gray-50 p-6 rounded-lg shadow-lg border">
-                            <p className="text-3xl font-extrabold text-gray-900">
-                                ₹{listing.price.toLocaleString()} <span className="text-lg font-medium text-gray-500">/ month</span>
-                            </p>
-                            <div className="mt-6">
-                                <p className="font-semibold text-gray-700">Contact Person: {listing.contact.name}</p>
-                                <a href={`tel:${listing.contact.phone}`} className="mt-4 w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-blue-600 hover:bg-blue-700">
-                                    <Phone size={20} className="mr-2"/> Call Now
-                                </a>
-                                <button className="mt-2 w-full flex items-center justify-center py-3 px-4 border border-blue-600 rounded-md shadow-sm text-lg font-medium text-blue-600 bg-white hover:bg-blue-50">
-                                    Send Inquiry
-                                </button>
-                            </div>
-                        </div>
-                    </aside>
-                </div>
+        {/* Image Gallery */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 h-96">
+          <div className="relative col-span-2 row-span-2">
+            <Image src={listing.imageUrls[0]} alt="Main listing view" fill className="object-cover rounded-xl" priority sizes="(max-width: 768px) 100vw, 50vw" />
+          </div>
+          {listing.imageUrls.slice(1, 4).map((img, index) => (
+            <div key={index} className="relative hidden md:block">
+              <Image src={img} alt={`Listing view ${index + 2}`} fill className="object-cover rounded-xl" sizes="25vw" />
             </div>
-        </main>
-    );
+          ))}
+        </div>
+
+        {/* Main Content */}
+        <div className="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-12">
+          <div className="lg:col-span-2 bg-white p-8 rounded-xl border border-neutral-200/80">
+            <h2 className="text-2xl font-bold text-neutral-800 border-b border-neutral-200 pb-4">About this place</h2>
+            <p className="mt-4 text-neutral-600 leading-relaxed whitespace-pre-line">{listing.description}</p>
+
+            <section className="mt-8">
+              <h3 className="text-xl font-bold text-neutral-800 mb-4">Details</h3>
+              <div className="grid grid-cols-2 gap-4 text-neutral-700">
+                {listing.gender && <div><span className="font-semibold">Gender:</span> {listing.gender}</div>}
+                <div><span className="font-semibold">Furnishing:</span> {listing.furnished}</div>
+                <div><span className="font-semibold">Electricity:</span> Bill paid by {listing.electricityBillBy}</div>
+              </div>
+            </section>
+
+            {availableAmenities.length > 0 && (
+                <section className="mt-8">
+                    <h3 className="text-xl font-bold text-neutral-800">Amenities</h3>
+                    <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3">
+                        {availableAmenities.map((key) => (
+                            <div key={key} className="flex items-center text-neutral-700">
+                                <span className="text-teal-600">{amenityIcons[key]}</span>
+                                <span className="ml-3 font-medium capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+            )}
+
+            <section className="mt-8">
+                <h3 className="text-xl font-bold text-neutral-800">Location</h3>
+                <div className="mt-4 rounded-lg overflow-hidden border border-neutral-200">
+                    <iframe src={mapEmbedUrl} width="100%" height="450" style={{ border: 0 }} allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade" title="Listing Location" />
+                </div>
+            </section>
+          </div>
+
+          <aside className="lg:col-span-1">
+            <div className="sticky top-24 bg-white p-6 rounded-xl shadow-lg border border-neutral-200/80">
+                <p className="text-3xl font-extrabold text-neutral-900">
+                    ₹{listing.rentPerMonth.toLocaleString()}
+                    <span className="text-lg font-medium text-neutral-500">/month</span>
+                </p>
+                 <div className="mt-4 space-y-2 border-t pt-4">
+                     <div className="flex justify-between items-center text-sm text-neutral-600"><span className="flex items-center gap-2"><ShieldCheck size={16}/>Deposit</span> <span className="font-medium">₹{listing.deposit.toLocaleString()}</span></div>
+                     {listing.maintenance && listing.maintenance > 0 && (
+                        <div className="flex justify-between items-center text-sm text-neutral-600"><span className="flex items-center gap-2"><Wrench size={16}/>Maintenance</span> <span className="font-medium">₹{listing.maintenance.toLocaleString()}</span></div>
+                     )}
+                 </div>
+              <div className="mt-6 space-y-3 border-t pt-4">
+                <p className="font-semibold text-neutral-700">Contact Person: {listing.contact.name}</p>
+                <a href={`tel:${listing.contact.phone}`} className="w-full flex items-center justify-center py-3 px-4 rounded-lg text-lg font-semibold text-white bg-teal-600 hover:bg-teal-700 transition">
+                  <Phone size={20} className="mr-2" /> Call Now
+                </a>
+                {listing.contact.email && (
+                  <a href={`mailto:${listing.contact.email}`} className="w-full flex items-center justify-center py-3 px-4 rounded-lg text-lg font-semibold text-teal-700 bg-teal-50 hover:bg-teal-100 transition">
+                    <Mail size={20} className="mr-2" /> Send Email
+                  </a>
+                )}
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </main>
+  );
 }

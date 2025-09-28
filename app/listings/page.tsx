@@ -1,156 +1,192 @@
-"use client";
+"use client"; // ✨ FIX: Was "use-client", now corrected to "use client"
 
-import { useState, useMemo, ChangeEvent } from 'react';
+import { useState, useMemo, ChangeEvent, useEffect } from "react";
 import Link from "next/link";
-import { MapPin, Filter, X } from "lucide-react";
-import Image from 'next/image';
+import { MapPin, Filter, Heart, Wind, Search } from "lucide-react";
+import Image from "next/image";
+import { IListing } from "@/types";
 
-// Interface for type safety
-interface Listing {
-  id: number;
-  title: string;
-  price: number;
-  type: "PG" | "Flat" | "Hostel";
-  location: string;
-  img: string;
-}
-
-// Expanded mock data with more details for filtering
-const allListings: Listing[] = [
-  { id: 1, title: "Modern Hostel near PICT", price: 8500, type: "Hostel", location: "Dhankawadi", img: "/hostel1.jpg" },
-  { id: 2, title: "Spacious 2 BHK Flat", price: 22000, type: "Flat", location: "Kothrud", img: "/flat1.jpg" },
-  { id: 3, title: "PG for Boys in Hinjewadi", price: 7000, type: "PG", location: "Hinjewadi", img: "/pg1.jpg" },
-  { id: 4, title: "Shared PG near FC Road", price: 9000, type: "PG", location: "Deccan", img: "/hostel1.jpg" },
-  { id: 5, title: "1 BHK for Students", price: 15000, type: "Flat", location: "Viman Nagar", img: "/flat1.jpg" },
-  { id: 6, title: "Girls Hostel with Mess", price: 10000, type: "Hostel", location: "Karve Nagar", img: "/pg1.jpg" },
-];
-
+// (The rest of your component code is correct and does not need to change)
 const initialFilters = {
-  location: '',
-  maxPrice: 30000,
-  types: { PG: true, Flat: true, Hostel: true }
+  address: "",
+  maxRent: 50000,
+  types: { PG: true, Flat: true, Hostel: true },
+  furnished: null as "Furnished" | "Semi-furnished" | "Unfurnished" | null,
 };
 
-export default function Listings() {
-  const [filters, setFilters] = useState(initialFilters);
+export default function ListingsPage() {
+  const [allListings, setAllListings] = useState<IListing[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [filters, setFilters] = useState(initialFilters);
+  const [pendingFilters, setPendingFilters] = useState(initialFilters);
 
-  const handleFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    const fetchListings = async () => {
+      try {
+        const res = await fetch('/api/listings');
+        const data = await res.json();
+        if (data.success) {
+          setAllListings(data.listings);
+        }
+      } catch (error) {
+        console.error("Failed to fetch listings:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchListings();
+  }, []);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("favorites");
+    if (saved) setFavorites(JSON.parse(saved));
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+  }, [favorites]);
+
+  const toggleFavorite = (id: string) => {
+    setFavorites((prev) =>
+      prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]
+    );
+  };
+  
+  const handlePendingFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
-    if (name === 'location') {
-      setFilters(prev => ({ ...prev, location: value }));
-    } else if (name === 'maxPrice') {
-      setFilters(prev => ({ ...prev, maxPrice: Number(value) }));
-    } else if (type === 'checkbox') {
-      setFilters(prev => ({
-        ...prev,
-        types: { ...prev.types, [name]: checked }
-      }));
-    }
+    setPendingFilters((prev) => {
+      if (name === "address") return { ...prev, address: value };
+      if (name === "maxRent") return { ...prev, maxRent: Number(value) };
+      if (type === "checkbox") {
+        if (name === "PG" || name === "Flat" || name === "Hostel") {
+          return { ...prev, types: { ...prev.types, [name]: checked }};
+        }
+      }
+      return prev;
+    });
+  };
+
+  const handleFurnishedChange = (value: typeof initialFilters.furnished) => {
+    setPendingFilters((prev) => ({ ...prev, furnished: value }));
   };
 
   const resetFilters = () => {
+    setPendingFilters(initialFilters);
     setFilters(initialFilters);
   };
-
-  const filteredListings = useMemo(() => {
-    return allListings.filter(item => {
-      const selectedTypes = Object.entries(filters.types)
-        .filter(([, checked]) => checked)
-        .map(([type]) => type);
-      
-      return (
-        item.location.toLowerCase().includes(filters.location.toLowerCase()) &&
-        item.price <= filters.maxPrice &&
-        selectedTypes.includes(item.type)
-      );
-    });
-  }, [filters]);
   
+  const filteredListings = useMemo(() => {
+    const selectedTypes = Object.entries(filters.types)
+      .filter(([, checked]) => checked)
+      .map(([type]) => type);
+
+    return allListings.filter((item) => {
+      const typeMatch = selectedTypes.includes(item.listingType);
+      const locationMatch = item.address.toLowerCase().includes(filters.address.toLowerCase());
+      const priceMatch = item.rentPerMonth <= filters.maxRent;
+      const furnishedMatch = filters.furnished === null ? true : item.furnished === filters.furnished;
+      return typeMatch && locationMatch && priceMatch && furnishedMatch;
+    });
+  }, [filters, allListings]);
+
   const FilterSidebar = () => (
-     <aside className="bg-white p-6 rounded-lg shadow-md h-fit">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">Filters</h2>
-          <button onClick={resetFilters} className="text-sm text-blue-600 hover:underline">Reset</button>
+    <aside className="bg-white p-6 rounded-xl border border-neutral-200/80 h-fit sticky top-24 max-w-xs w-full">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-bold text-neutral-800">Filters</h2>
+        <button onClick={resetFilters} className="text-sm text-teal-600 hover:underline font-semibold">Reset</button>
+      </div>
+      <div className="space-y-6">
+        <div>
+          <label htmlFor="location" className="block text-sm font-medium text-neutral-700">Location</label>
+          <div className="relative mt-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+            <input type="text" name="address" id="location" value={pendingFilters.address} onChange={handlePendingFilterChange} placeholder="e.g., Kothrud" className="w-full border border-neutral-300 rounded-lg shadow-sm py-2 pl-9 pr-3 focus:ring-teal-500 focus:border-teal-500 transition" />
+          </div>
         </div>
-        <div className="space-y-6">
-          <div>
-            <label htmlFor="location" className="block text-sm font-medium text-gray-700">Location</label>
-            <input type="text" name="location" id="location" value={filters.location} onChange={handleFilterChange} placeholder="e.g., Kothrud" className="mt-1 w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500"/>
+        <div>
+          <label htmlFor="maxRent" className="block text-sm font-medium text-neutral-700">Max Rent: ₹{pendingFilters.maxRent.toLocaleString()}</label>
+          <input type="range" name="maxRent" id="maxRent" min="500" max="50000" step="1000" value={pendingFilters.maxRent} onChange={handlePendingFilterChange} className="mt-1 w-full h-2 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-teal-600" />
+        </div>
+        <div>
+          <h3 className="text-sm font-medium text-neutral-700">Listing Type</h3>
+          <div className="mt-2 space-y-2">
+            {Object.keys(pendingFilters.types).map((type) => (
+              <div key={type} className="flex items-center">
+                <input id={type} name={type} type="checkbox" checked={pendingFilters.types[type as keyof typeof pendingFilters.types]} onChange={handlePendingFilterChange} className="h-4 w-4 text-teal-600 border-neutral-300 rounded focus:ring-teal-500" />
+                <label htmlFor={type} className="ml-2 block text-sm text-neutral-900">{type}</label>
+              </div>
+            ))}
           </div>
-          <div>
-            <label htmlFor="maxPrice" className="block text-sm font-medium text-gray-700">Max Price: ₹{filters.maxPrice.toLocaleString()}</label>
-            <input type="range" name="maxPrice" id="maxPrice" min="5000" max="30000" step="1000" value={filters.maxPrice} onChange={handleFilterChange} className="mt-1 w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"/>
-          </div>
-          <div>
-            <h3 className="text-sm font-medium text-gray-700">Listing Type</h3>
-            <div className="mt-2 space-y-2">
-              {Object.keys(filters.types).map(type => (
-                <div key={type} className="flex items-center">
-                  <input id={type} name={type} type="checkbox" checked={filters.types[type as keyof typeof filters.types]} onChange={handleFilterChange} className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"/>
-                  <label htmlFor={type} className="ml-2 block text-sm text-gray-900">{type}</label>
-                </div>
+        </div>
+        <div>
+          <h3 className="text-sm font-medium text-neutral-700">Furnishing</h3>
+          <div className="mt-2 grid grid-cols-2 gap-2">
+              {['Furnished', 'Semi-furnished', 'Unfurnished'].map(opt => (
+                  <button key={opt} onClick={() => handleFurnishedChange(opt as typeof initialFilters.furnished)} className={`text-sm py-1.5 px-2 rounded-lg border transition ${pendingFilters.furnished === opt ? 'bg-teal-600 text-white border-teal-600' : 'bg-white hover:bg-neutral-100'}`}>
+                      {opt}
+                  </button>
               ))}
-            </div>
           </div>
+           {pendingFilters.furnished && <button onClick={() => handleFurnishedChange(null)} className="text-xs text-neutral-500 hover:text-red-600 mt-2">Clear</button>}
         </div>
-      </aside>
+        <button onClick={() => { setFilters(pendingFilters); setIsFilterOpen(false); }} className="w-full bg-teal-600 text-white font-semibold rounded-lg px-4 py-2 hover:bg-teal-700 transition">Apply Filters</button>
+      </div>
+    </aside>
   );
 
   return (
-    <main className="bg-gray-50 min-h-screen">
+    <main className="bg-neutral-50 min-h-screen">
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <h1 className="text-4xl font-extrabold text-gray-900 mb-8">Available Listings in Pune</h1>
-        
-        {/* Mobile Filter Button */}
+        <h1 className="text-4xl font-extrabold text-neutral-900 mb-8 text-center">Available Listings</h1>
+
         <div className="lg:hidden mb-4">
-            <button 
-                onClick={() => setIsFilterOpen(!isFilterOpen)} 
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >
-                {isFilterOpen ? <X size={18} /> : <Filter size={18} />}
-                {isFilterOpen ? 'Hide Filters' : 'Show Filters'}
-            </button>
+          <button onClick={() => setIsFilterOpen(!isFilterOpen)} className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white border border-neutral-300 rounded-lg shadow-sm text-sm font-medium text-neutral-700 hover:bg-neutral-50">
+            <Filter size={18} />{isFilterOpen ? "Hide Filters" : "Show Filters"}
+          </button>
         </div>
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Filters Sidebar */}
-          <div className={`${isFilterOpen ? 'block' : 'hidden'} lg:block lg:col-span-1`}>
+          <div className={`${isFilterOpen ? "block" : "hidden"} lg:block`}>
             <FilterSidebar />
           </div>
 
-          {/* Listings Grid */}
           <div className="lg:col-span-3">
-            {filteredListings.length > 0 ? (
+            {loading ? (
+              <p>Loading...</p>
+            ) : filteredListings.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {filteredListings.map((item) => (
-                  <Link key={item.id} href={`/listings/${item.id}`} className="group block bg-white rounded-xl shadow-md overflow-hidden transition-transform transform hover:-translate-y-2 hover:shadow-xl">
+                  <div key={item._id} className="group bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border border-neutral-200/80">
                     <div className="relative h-56 w-full">
-                      <Image 
-                        src={item.img} 
-                        alt={item.title} 
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      />
-                      <span className="absolute top-4 left-4 bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full">{item.type}</span>
+                      <Image src={item.imageUrls[0]} alt={item.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw"/>
+                      <span className="absolute top-3 left-3 bg-teal-600 text-white text-xs font-semibold px-3 py-1 rounded-full">{item.listingType}</span>
+                      <button onClick={(e) => { e.preventDefault(); toggleFavorite(item._id); }} className="absolute top-3 right-3 text-red-500 bg-white/80 backdrop-blur-sm rounded-full p-1.5 transition hover:bg-white" aria-label="Add to favorites">
+                        <Heart size={20} fill={favorites.includes(item._id) ? "#ef4444" : "none"} strokeWidth={1.5} />
+                      </button>
                     </div>
-                    <div className="p-4">
-                      <h2 className="font-bold text-lg text-gray-900 truncate group-hover:text-blue-600">{item.title}</h2>
-                      <p className="flex items-center text-gray-500 text-sm mt-1">
-                        <MapPin size={14} className="mr-1.5" /> {item.location}
+                    <Link href={`/listings/${item._id}`} className="block p-4">
+                      <h2 className="font-bold text-lg text-neutral-800 truncate group-hover:text-teal-600 transition">{item.title}</h2>
+                      <p className="flex items-center text-neutral-500 text-sm mt-1">
+                        <MapPin size={14} className="mr-1.5 flex-shrink-0" /> {item.address.split(',').slice(0, 2).join(', ')}
                       </p>
-                      <p className="text-xl font-extrabold text-blue-600 mt-3">
-                        ₹{item.price.toLocaleString()} <span className="text-sm font-medium text-gray-500">/ month</span>
-                      </p>
-                    </div>
-                  </Link>
+                      <div className="flex items-baseline justify-between mt-4">
+                        <p className="text-xl font-extrabold text-teal-600">
+                          ₹{item.rentPerMonth.toLocaleString()}
+                          <span className="text-sm font-medium text-neutral-500">/month</span>
+                        </p>
+                        <span className="text-xs font-semibold text-neutral-600">{item.furnished}</span>
+                      </div>
+                    </Link>
+                  </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-16 bg-white rounded-lg shadow-md col-span-full">
-                <h3 className="text-xl font-semibold">No Listings Found</h3>
-                <p className="text-gray-500 mt-2">Try adjusting your filters or click &apos;Reset&apos; to see all listings.</p>
+              <div className="text-center py-16 bg-white rounded-xl shadow-md border col-span-full">
+                <Wind size={48} className="mx-auto text-neutral-400" />
+                <h3 className="mt-4 text-xl font-semibold text-neutral-800">No Listings Found</h3>
+                <p className="text-neutral-500 mt-2">Try adjusting your filters or click Reset to see all available places.</p>
               </div>
             )}
           </div>
