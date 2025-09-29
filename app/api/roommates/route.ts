@@ -86,6 +86,8 @@ export async function POST(request: NextRequest) {
         amenities: JSON.parse(formData.get('amenities') as string),
         contact: JSON.parse(formData.get('contact') as string),
         imageUrls: imageUrls,
+        // ✨ FIX 2: Read the 'createdBy' field from the form data
+        createdBy: formData.get('createdBy'),
     };
 
     // ✨ Create new listing. Mongoose automatically validates the data against your schema!

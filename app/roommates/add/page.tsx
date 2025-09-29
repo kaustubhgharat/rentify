@@ -1,4 +1,4 @@
-// app/new-listing/page.tsx
+// app/roommate/add/page.tsx
 
 "use client";
 
@@ -34,7 +34,7 @@ const initialFormState: NewListingFormData = {
     washingMachine: false,
   },
   images: [],
-  contact: { phone: "", email: "" },
+  contact: {name: "", phone: "", email: "" },
 };
 
 export default function NewListingPage() {
@@ -109,7 +109,7 @@ export default function NewListingPage() {
         ...prev,
         amenities: { ...prev.amenities, [name]: checked },
       }));
-    } else if (name === "phone" || name === "email") {
+    } else if (name == "name" || name === "phone" || name === "email") {
       setForm((prev) => ({
         ...prev,
         contact: { ...prev.contact, [name]: value },
@@ -355,35 +355,44 @@ export default function NewListingPage() {
             </div>
           </div>
 
-          {/* Contact */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-neutral-700">
-                Contact Phone
-              </label>
-              <input
-                type="tel"
-                name="phone"
-                value={form.contact.phone}
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full border border-neutral-300 rounded-lg py-2 px-3 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition"
-              />
+          {/* ✨ FIX 3: Add an input field for the Contact Name */}
+            <div className="border-t pt-6">
+                <h3 className="text-lg font-semibold text-neutral-800">Contact Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div>
+                        <label className="block text-sm font-medium text-neutral-700">Contact Name</label>
+                        <input
+                            type="text"
+                            name="name" // This name targets the 'contact' object in handleChange
+                            value={form.contact.name}
+                            onChange={handleChange}
+                            required
+                            className="mt-1 w-full border border-neutral-300 rounded-lg py-2 px-3"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-neutral-700">Contact Phone</label>
+                        <input
+                            type="tel"
+                            name="phone"
+                            value={form.contact.phone}
+                            onChange={handleChange}
+                            required
+                            className="mt-1 w-full border border-neutral-300 rounded-lg py-2 px-3"
+                        />
+                    </div>
+                    <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-neutral-700">Contact Email (Optional)</label>
+                        <input
+                            type="email"
+                            name="email"
+                            value={form.contact.email}
+                            onChange={handleChange}
+                            className="mt-1 w-full border border-neutral-300 rounded-lg py-2 px-3"
+                        />
+                    </div>
+                </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-neutral-700">
-                Contact Email
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={form.contact.email}
-                required
-                onChange={handleChange}
-                className="mt-1 block w-full border border-neutral-300 rounded-lg py-2 px-3 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition"
-              />
-            </div>
-          </div>
 
           {/* Images */}
           <div>

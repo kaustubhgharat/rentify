@@ -3,8 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
-import { ClerkProvider } from "@clerk/nextjs";
 import Script from "next/script";
+import { AuthProvider } from "@/context/AuthContext";
+import Providers from "./providers"; // This provides the SessionProvider for NextAuth
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,17 +29,31 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <ClerkProvider>
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-          <Navbar />
-          {children}
-          <Script
-            src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY}&libraries=places`}
-            strategy="beforeInteractive"
-          />
-          <Footer />
-        </body>
-      </ClerkProvider>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        {/*
+          The <Providers> component wraps your entire application to make the
+          NextAuth session available globally via the useSession() hook.
+        */}
+        <Providers>
+          {/*
+            Your custom AuthProvider can now safely use useSession() if needed,
+            as it's a child of the main SessionProvider.
+          */}
+          <AuthProvider>
+            <Navbar />
+            <main className="min-h-screen">
+              {children}
+            </main>
+            <Script
+              src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY}&libraries=places`}
+              strategy="beforeInteractive"
+            />
+            <Footer />
+          </AuthProvider>
+        </Providers>
+      </body>
     </html>
   );
 }

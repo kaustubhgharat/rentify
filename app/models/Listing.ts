@@ -16,6 +16,11 @@ const contactSchema = new Schema({
 }, { _id: false });
 
 const listingSchema = new Schema({
+  owner: {
+    type: Schema.Types.ObjectId,
+    ref: 'User', // This creates a reference to the User model
+    required: true,
+  },
   title: { type: String, required: [true, 'Title is required.'] },
   listingType: { type: String, enum: ['PG', 'Flat', 'Hostel'], required: true },
   gender: { type: String, enum: ['Male', 'Female', 'Any'] },

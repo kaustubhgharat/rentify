@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { v2 as cloudinary } from 'cloudinary';
 import Listing from '@/models/Listing';
 import connectDB from "@/lib/mongoose";
+import { cookies } from 'next/headers'; // Import cookies
+import jwt from 'jsonwebtoken';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,6 +47,7 @@ export async function GET() {
     const listings = await Listing.find({}).sort({ createdAt: -1 });
     return NextResponse.json({ success: true, listings });
   } catch (error) {
+    console.log(error);
     return NextResponse.json({ success: false, error: 'Server error fetching listings.' }, { status: 500 });
   }
 }
@@ -53,6 +56,19 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    if (!token) {
+      return NextResponse.json({ success: false, error: "Not authenticated" }, { status: 401 });
+    }
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET!) as { id: string; role: string };
+    
+    // Only owners can create listings
+    if (decodedToken.role !== 'owner') {
+        return NextResponse.json({ success: false, error: "Only owners can create listings." }, { status: 403 });
+    }
+    const ownerId = decodedToken.id;
+
     const formData = await request.formData();
     const images = formData.getAll("images") as File[];
 
@@ -63,6 +79,7 @@ export async function POST(request: NextRequest) {
     const imageUrls = await Promise.all(images.map(uploadToCloudinary));
     
     const listingData = {
+      owner: ownerId,
       title: formData.get('title'),
       listingType: formData.get('listingType'),
       gender: formData.get('gender'),

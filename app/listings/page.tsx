@@ -5,6 +5,8 @@ import Link from "next/link";
 import { MapPin, Filter, Heart, Wind, Search } from "lucide-react";
 import Image from "next/image";
 import { IListing } from "@/types";
+import { useAuth } from "@/context/AuthContext"; // Import useAuth
+
 
 // (The rest of your component code is correct and does not need to change)
 const initialFilters = {
@@ -15,12 +17,29 @@ const initialFilters = {
 };
 
 export default function ListingsPage() {
+    const { user, isAuthenticated } = useAuth(); // Get user from context
   const [allListings, setAllListings] = useState<IListing[]>([]);
   const [loading, setLoading] = useState(true);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [filters, setFilters] = useState(initialFilters);
   const [pendingFilters, setPendingFilters] = useState(initialFilters);
+
+    useEffect(() => {
+    // ... (your existing fetch for allListings)
+
+    if (isAuthenticated && user?.role === 'student') {
+      const fetchFavorites = async () => {
+        const res = await fetch('/api/favorites');
+        const data = await res.json();
+        if (data.success) {
+          // Store just the IDs for easy checking
+          setFavorites(data.favorites.map((fav: IListing) => fav._id));
+        }
+      };
+      fetchFavorites();
+    }
+  }, [isAuthenticated, user]);
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -48,10 +67,27 @@ export default function ListingsPage() {
     localStorage.setItem("favorites", JSON.stringify(favorites));
   }, [favorites]);
 
-  const toggleFavorite = (id: string) => {
-    setFavorites((prev) =>
-      prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]
-    );
+  const toggleFavorite = async (listingId: string) => {
+    if (!isAuthenticated) {
+      alert("Please sign in to add favorites.");
+      return;
+    }
+
+    const isFavorited = favorites.includes(listingId);
+    
+    // Optimistic UI update
+    if (isFavorited) {
+      setFavorites(prev => prev.filter(id => id !== listingId));
+    } else {
+      setFavorites(prev => [...prev, listingId]);
+    }
+
+    // API call
+    await fetch('/api/favorites', {
+      method: isFavorited ? 'DELETE' : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ listingId }),
+    });
   };
   
   const handlePendingFilterChange = (e: ChangeEvent<HTMLInputElement>) => {

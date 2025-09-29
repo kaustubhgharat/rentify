@@ -62,10 +62,7 @@ const roommateSchema = new Schema({
     required: true,
   },
   contact: contactSchema,
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
+ 
 });
 
 // Using the name 'Roommate' will create a 'roommates' collection in MongoDB
