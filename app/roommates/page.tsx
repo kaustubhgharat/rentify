@@ -3,7 +3,6 @@
 "use client";
 
 import { useState, useEffect, useMemo, ChangeEvent } from "react";
-import Image from "next/image";
 import {
  PlusCircle, Users, Search,
  Bed, Wifi,

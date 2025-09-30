@@ -74,6 +74,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
         return NextResponse.json({ success: true, listing: updatedListing });
     } catch (error) {
+        console.log(error);
         return NextResponse.json({ success: false, error: 'Server error' }, { status: 500 });
     }
 }
@@ -107,6 +108,8 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
         return NextResponse.json({ success: true, message: "Listing deleted successfully" });
     } catch (error) {
+                console.log(error);
+
         return NextResponse.json({ success: false, error: 'Server error' }, { status: 500 });
     }
 }
