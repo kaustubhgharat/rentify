@@ -42,9 +42,9 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-semibold text-slate-200 tracking-wider uppercase">Support</h3>
             <ul className="mt-4 space-y-3">
-              <li><Link href="/about" className="hover:text-teal-400 transition-all transform hover:translate-x-1 block">About Us</Link></li>
-              <li><Link href="/contact" className="hover:text-teal-400 transition-all transform hover:translate-x-1 block">Contact</Link></li>
-              <li><Link href="/faq" className="hover:text-teal-400 transition-all transform hover:translate-x-1 block">FAQ</Link></li>
+              <li><Link href="/" className="hover:text-teal-400 transition-all transform hover:translate-x-1 block">About Us</Link></li>
+              <li><Link href="/" className="hover:text-teal-400 transition-all transform hover:translate-x-1 block">Contact</Link></li>
+              <li><Link href="/" className="hover:text-teal-400 transition-all transform hover:translate-x-1 block">FAQ</Link></li>
             </ul>
           </div>
 
