@@ -2,7 +2,7 @@
 
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { IListing } from "@/types";
+import { IListing } from "../../types";
 import { 
   MapPin, Phone, Mail, Wifi, Bed, AirVent, ParkingCircle, 
   UtensilsCrossed, Table, WashingMachine, ShieldCheck, Wrench, Home, Users

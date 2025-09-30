@@ -2,7 +2,7 @@
 
 import { useState, ChangeEvent, FormEvent, useEffect, useRef } from "react";
 import { Save } from "lucide-react";
-import { Listing } from "@/types";
+import { Listing } from "../../../types";
 import { useRouter, useParams } from 'next/navigation';
 import { Loader } from "lucide-react";
 

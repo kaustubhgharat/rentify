@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import Listing from '@/models/Listing';
-import connectDB from "@/lib/mongoose";
+import Listing from '../../../models/Listing';
+import connectDB from "../../../lib/mongoose";
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import dbConnect from "@/lib/mongoose"; // Make sure this path is correct for your project
-import Roommate from "@/models/Roommate";
-import { getUserIdFromRequest } from "@/lib/auth"; // Import the authentication helper
+import dbConnect from "../../../lib/mongoose";
+import Roommate from "../../../models/Roommate";
+import { getUserIdFromRequest } from "../../../lib/auth";   //Import the authentication helper
 
 export async function GET(request: NextRequest) {
   try {

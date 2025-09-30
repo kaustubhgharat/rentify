@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAuth } from "@/context/AuthContext";
-import { IListing } from "@/types";
+import { useAuth } from "../context/AuthContext";
+import { IListing } from "../types";
 import { Loader2, Building, PlusCircle, Trash2, Edit } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";

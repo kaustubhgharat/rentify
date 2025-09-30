@@ -10,8 +10,8 @@ import {
   WashingMachine, 
 } from "lucide-react";
 import Link from "next/link";
-import { Listing } from "@/types";
-import ListingCard from "@/components/ListingCard"; // <-- IMPORT THE NEW COMPONENT
+import { Listing } from "../types";
+import ListingCard from "../components/ListingCard"; // <-- IMPORT THE NEW COMPONENT
 
 
 interface Filters {

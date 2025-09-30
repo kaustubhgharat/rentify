@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Listing } from "@/types";
+import { Listing } from "../types";
 import { PlusCircle, Loader, AlertCircle } from "lucide-react";
 import ListingCard from "../components/ListingCard"; // <-- IMPORT THE NEW COMPONENT
 import {

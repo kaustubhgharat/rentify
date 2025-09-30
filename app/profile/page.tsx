@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, FormEvent, ChangeEvent } from "react";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 import { UserCircle, Edit, Save, Loader2,  KeyRound } from "lucide-react";
 import { useRouter } from 'next/navigation';
 

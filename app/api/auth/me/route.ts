@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getUserIdFromRequest } from "@/lib/auth"; // Import our helper
-import User from "@/models/User";
-import connectDB from "@/lib/mongoose";
+import { getUserIdFromRequest } from "../../../lib/auth"; // Import our helper
+import User from "../../../models/User";
+import connectDB from "../../../lib/mongoose";
 
 export async function GET(request: NextRequest) {
   try {

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { v2 as cloudinary } from 'cloudinary';
-import Listing from '@/models/Listing';
-import connectDB from "@/lib/mongoose";
+import Listing from '../../models/Listing';
+import connectDB from "../../lib/mongoose";
 import { cookies } from 'next/headers'; // Import cookies
 import jwt from 'jsonwebtoken';
 
