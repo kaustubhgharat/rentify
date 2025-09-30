@@ -12,6 +12,7 @@
     "@clerk/nextjs": "^6.32.2",
     "bcryptjs": "^3.0.2",
     "cloudinary": "^2.7.0",
+    "jose": "^6.1.0",
     "jsonwebtoken": "^9.0.2",
     "leaflet": "^1.9.4",
     "leaflet-control-geocoder": "^3.3.1",

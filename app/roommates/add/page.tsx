@@ -156,6 +156,7 @@ export default function NewListingPage() {
       const res = await fetch("/api/roommates", {
         method: "POST",
         body: formData, // Send FormData, not JSON
+        credentials: 'include',
       });
 
       const data = await res.json();

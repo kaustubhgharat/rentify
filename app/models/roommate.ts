@@ -62,6 +62,11 @@ const roommateSchema = new Schema({
     required: true,
   },
   contact: contactSchema,
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: 'User', // This should match the name of your User model
+    required: true,
+  }
  
 });
 

@@ -5,7 +5,6 @@ import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import Script from "next/script";
 import { AuthProvider } from "@/context/AuthContext";
-import Providers from "./providers"; // This provides the SessionProvider for NextAuth
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,15 +31,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/*
-          The <Providers> component wraps your entire application to make the
-          NextAuth session available globally via the useSession() hook.
-        */}
-        <Providers>
-          {/*
-            Your custom AuthProvider can now safely use useSession() if needed,
-            as it's a child of the main SessionProvider.
-          */}
+        
           <AuthProvider>
             <Navbar />
             <main className="min-h-screen">
@@ -52,7 +43,6 @@ export default function RootLayout({
             />
             <Footer />
           </AuthProvider>
-        </Providers>
       </body>
     </html>
   );

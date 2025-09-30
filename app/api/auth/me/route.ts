@@ -1,23 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
-import jwt from 'jsonwebtoken';
-import { cookies } from 'next/headers';
+import { getUserIdFromRequest } from "@/lib/auth"; // Import our helper
+import User from "@/models/User";
+import connectDB from "@/lib/mongoose";
 
 export async function GET(request: NextRequest) {
-    try {
-        // ✨ FIX: Add 'await' to resolve the persistent TypeScript error.
-        const cookieStore = await cookies();
-        const token = cookieStore.get('token')?.value;
+  try {
+    // Use the helper to get the user ID from the token cookie
+    const userId = getUserIdFromRequest(request);
 
-        if (!token) {
-            return NextResponse.json({ success: false, error: "Not authenticated" }, { status: 401 });
-        }
-
-        const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-        
-        return NextResponse.json({ success: true, user: decoded });
-
-    } catch (error) {
-        console.log(error);
-        return NextResponse.json({ success: false, error: "Invalid token" }, { status: 401 });
+    if (!userId) {
+      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
+
+    await connectDB();
+    
+    // Find the user in the database, but exclude the password
+    const user = await User.findById(userId).select('-password');
+
+    if (!user) {
+      return NextResponse.json({ success: false, error: "User not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, user: user });
+
+  } catch (error) {
+        console.log(error);
+
+    return NextResponse.json({ success: false, error: "Server Error" }, { status: 500 });
+  }
 }
