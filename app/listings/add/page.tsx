@@ -1,3 +1,5 @@
+// app/listings/add/page.tsx
+
 "use client";
 
 import { useState, ChangeEvent, FormEvent, useEffect, useRef } from "react";
@@ -15,11 +17,13 @@ const amenityOptions = [
   { key: "washingMachine", label: "Washing Machine", icon: <WashingMachine size={20} /> },
 ] as const;
 
-// ✨ State now matches the Mongoose model (nested contact object)
+// ✨ State now includes bhkType and bedsPerRoom
 const initialFormState = {
     title: "",
     listingType: "PG" as "PG" | "Flat" | "Hostel",
     gender: "Any" as "Male" | "Female" | "Any",
+    bhkType: "1 BHK", // Default value for Flat
+    bedsPerRoom: "2",   // Default value for PG/Hostel
     address: "",
     latitude: undefined as number | undefined,
     longitude: undefined as number | undefined,
@@ -46,40 +50,103 @@ const initialFormState = {
     },
 };
 
+
 export default function AddListingPage() {
   const [form, setForm] = useState(initialFormState);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const mapRef = useRef<HTMLDivElement>(null);
   const autocompleteRef = useRef<HTMLInputElement>(null);
+    const [isApiLoaded, setIsApiLoaded] = useState(false);
+  // ✨ REVISED: This useEffect is now safe for React Strict Mode
+useEffect(() => {
+    const scriptId = 'google-maps-script';
+    
+    // 1. Check if the script tag already exists in the document
+    const existingScript = document.getElementById(scriptId);
+    
+    // Also check if window.google is already available
+    if (window.google) {
+        setIsApiLoaded(true);
+        return;
+    }
+    
+    // If the script already exists but window.google isn't ready, we wait.
+    // The `onload` event on the existing script will handle setting the state.
+    if (existingScript) {
+        return;
+    }
 
-  useEffect(() => {
-    if (typeof window.google === "undefined" || !mapRef.current || !autocompleteRef.current) return;
-    const map = new google.maps.Map(mapRef.current, { center: { lat: 18.5204, lng: 73.8567 }, zoom: 12 });
-    const marker = new google.maps.Marker({ map, draggable: true });
-    const autocomplete = new google.maps.places.Autocomplete(autocompleteRef.current, { fields: ["formatted_address", "geometry"] });
+    // 2. If it doesn't exist, create and append it
+    const script = document.createElement('script');
+    script.id = scriptId; // Add an ID to easily find it later
+script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY}&libraries=places,marker`;
+    script.async = true;
+    script.defer = true;
+    
+    script.onload = () => setIsApiLoaded(true);
+    script.onerror = () => console.error("Google Maps script failed to load.");
+
+    document.body.appendChild(script);
+
+    // 3. We intentionally do NOT include a cleanup function to remove the script.
+    // This way, it stays loaded on the page even if the component unmounts and remounts in Strict Mode.
+
+}, []); // This effect still runs only on the initial mount sequence
+
+// ✨ MODIFIED: This useEffect now uses the new AdvancedMarkerElement
+useEffect(() => {
+    if (!isApiLoaded || typeof window.google === 'undefined' || !mapRef.current || !autocompleteRef.current) return;
+    
+    // Use a new variable for the Advanced Marker class for easier access
+    const AdvancedMarkerElement = google.maps.marker.AdvancedMarkerElement;
+
+    const map = new google.maps.Map(mapRef.current, {
+        center: { lat: 18.5204, lng: 73.8567 },
+        zoom: 12,
+        // This mapId is required for using Advanced Markers
+        mapId: 'YOUR_MAP_ID' // You can create a Map ID in the Google Cloud Console
+    });
+
+    const marker = new AdvancedMarkerElement({
+        map: map,
+        position: { lat: 18.5204, lng: 73.8567 },
+        gmpDraggable: true // Note: the property is gmpDraggable, not draggable
+    });
+    
+    const autocomplete = new google.maps.places.Autocomplete(autocompleteRef.current, {
+        fields: ["formatted_address", "geometry"]
+    });
 
     autocomplete.addListener("place_changed", () => {
-      const place = autocomplete.getPlace();
-      if (!place.geometry || !place.geometry.location) return;
-      const location = place.geometry.location;
-      setForm((prev) => ({
-        ...prev,
-        address: place.formatted_address || "",
-        latitude: location.lat(),
-        longitude: location.lng(),
-      }));
-      map.setCenter(location);
-      map.setZoom(16);
-      marker.setPosition(location);
+        const place = autocomplete.getPlace();
+        if (!place.geometry || !place.geometry.location) return;
+        
+        const location = place.geometry.location;
+        const lat = location.lat();
+        const lng = location.lng();
+
+        setForm((prev) => ({
+            ...prev,
+            address: place.formatted_address || "",
+            latitude: lat,
+            longitude: lng,
+        }));
+        
+        map.setCenter(location);
+        map.setZoom(16);
+        marker.position = { lat, lng }; // Update marker's position property
     });
 
-    marker.addListener("dragend", () => {
-      const pos = marker.getPosition();
-      if (!pos) return;
-      setForm((prev) => ({ ...prev, latitude: pos.lat(), longitude: pos.lng() }));
+    // Note: the event name is "gmp-dragend"
+    marker.addListener("gmp-dragend", () => {
+        const pos = marker.position as google.maps.LatLng; // The position will be a LatLng object
+        if (!pos) return;
+        setForm((prev) => ({ ...prev, latitude: pos.lat(), longitude: pos.lng() }));
     });
-  }, []);
+
+}, [isApiLoaded]);
+
 
   // ✨ Simplified handler for both top-level and nested contact fields
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -160,14 +227,44 @@ export default function AddListingPage() {
                 <option>PG</option> <option>Flat</option> <option>Hostel</option>
               </select>
             </div>
-            {(form.listingType === "PG" || form.listingType === "Hostel") && (
+            
+            {/* === CONDITIONAL INPUT FOR FLATS === */}
+            {form.listingType === "Flat" && (
               <div>
-                <label htmlFor="gender" className="block text-sm font-medium text-neutral-700">Gender</label>
-                <select name="gender" id="gender" value={form.gender || ""} onChange={handleChange} className="mt-1 block w-full border-neutral-300 rounded-lg shadow-sm py-2 px-3 focus:ring-2 focus:ring-teal-500 transition">
-                  <option value="Any">Any</option> <option value="Male">Male</option> <option value="Female">Female</option>
+                <label htmlFor="bhkType" className="block text-sm font-medium text-neutral-700">BHK Type</label>
+                <select name="bhkType" id="bhkType" value={form.bhkType} onChange={handleChange} className="mt-1 block w-full border-neutral-300 rounded-lg shadow-sm py-2 px-3 focus:ring-2 focus:ring-teal-500 transition">
+                  <option>1 RK</option>
+                  <option>1 BHK</option>
+                  <option>2 BHK</option>
+                  <option>3 BHK</option>
+                  <option>4 BHK</option>
+                  <option>4+ BHK</option>
                 </select>
               </div>
             )}
+
+            {/* === CONDITIONAL INPUT FOR PG / HOSTEL === */}
+            {(form.listingType === "PG" || form.listingType === "Hostel") && (
+              <>
+                <div>
+                  <label htmlFor="bedsPerRoom" className="block text-sm font-medium text-neutral-700">Beds per Room</label>
+                  <select name="bedsPerRoom" id="bedsPerRoom" value={form.bedsPerRoom} onChange={handleChange} className="mt-1 block w-full border-neutral-300 rounded-lg shadow-sm py-2 px-3 focus:ring-2 focus:ring-teal-500 transition">
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5+</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="gender" className="block text-sm font-medium text-neutral-700">Gender</label>
+                  <select name="gender" id="gender" value={form.gender || ""} onChange={handleChange} className="mt-1 block w-full border-neutral-300 rounded-lg shadow-sm py-2 px-3 focus:ring-2 focus:ring-teal-500 transition">
+                    <option value="Any">Any</option> <option value="Male">Male</option> <option value="Female">Female</option>
+                  </select>
+                </div>
+              </>
+            )}
+            
           </div>
           {/* Address Search & Map Section */}
           <div>
@@ -212,7 +309,6 @@ export default function AddListingPage() {
           </div>
           {/* Owner Contact */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-             {/* ✨ Note: name attributes are now 'name', 'phone', 'email' to match the nested state handler */}
             <div><label htmlFor="contact-name" className="block text-sm font-medium text-neutral-700">Owner Name</label><input type="text" name="name" id="contact-name" required value={form.contact.name} onChange={handleChange} placeholder="Your full name" className="mt-1 block w-full border-neutral-300 rounded-lg shadow-sm py-2 px-3 focus:ring-2 focus:ring-teal-500 transition" /></div>
             <div><label htmlFor="contact-phone" className="block text-sm font-medium text-neutral-700">Owner Phone</label><input type="tel" name="phone" id="contact-phone" required value={form.contact.phone} onChange={handleChange} placeholder="e.g., +91 9876543210" className="mt-1 block w-full border-neutral-300 rounded-lg shadow-sm py-2 px-3 focus:ring-2 focus:ring-teal-500 transition" /></div>
             <div><label htmlFor="contact-email" className="block text-sm font-medium text-neutral-700">Owner Email (Optional)</label><input type="email" name="email" id="contact-email" value={form.contact.email} onChange={handleChange} placeholder="your.email@example.com" className="mt-1 block w-full border-neutral-300 rounded-lg shadow-sm py-2 px-3 focus:ring-2 focus:ring-teal-500 transition" /></div>

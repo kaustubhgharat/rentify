@@ -58,9 +58,6 @@ async function uploadImagesToCloudinary(images: File[]): Promise<string[]> {
 export async function GET() {
   try {
     await dbConnect();
-
-    // Find all documents in the Roommate collection
-    // .sort({ createdAt: -1 }) shows the newest posts first
     const listings = await Roommate.find({}).sort({ createdAt: -1 });
 
     return NextResponse.json({ success: true, listings: listings });

@@ -7,6 +7,8 @@ const amenitiesSchema = new Schema({
   parking: { type: Boolean, default: false },
   bed: { type: Boolean, default: false },
   table: { type: Boolean, default: false },
+    washingMachine: { type: Boolean, default: false }, // Added missing field from your form
+
 }, { _id: false });
 
 const contactSchema = new Schema({
@@ -23,6 +25,8 @@ const listingSchema = new Schema({
   },
   title: { type: String, required: [true, 'Title is required.'] },
   listingType: { type: String, enum: ['PG', 'Flat', 'Hostel'], required: true },
+ bhkType: { type: String },      // For 'Flat' type
+  bedsPerRoom: { type: String },
   gender: { type: String, enum: ['Male', 'Female', 'Any'] },
   address: { type: String, required: [true, 'Address is required.'] },
   latitude: { type: Number },

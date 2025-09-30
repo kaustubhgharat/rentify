@@ -5,6 +5,8 @@ export interface Listing {
   _id: ObjectId | string; // Can be ObjectId from DB or string
   title: string;
   listingType: "Flat" | "PG";
+   bhkType?: string;      // Add this optional field
+  bedsPerRoom?: string;  
   gender?: "Male" | "Female" | "Any";
   address: string;
   latitude?: number;
@@ -36,7 +38,9 @@ export interface Listing {
 export interface IListing {
   _id: string;
   title: string;
-  listingType: "PG" | "Flat" | "Hostel";
+  listingType: 'PG' | 'Flat' | 'Hostel';
+  bhkType?: string;      // Add this optional field
+  bedsPerRoom?: string;  // Add this optional field
   gender?: "Male" | "Female" | "Any";
   address: string;
   latitude?: number;

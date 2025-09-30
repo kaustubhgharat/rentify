@@ -1,15 +1,18 @@
+// app/listings/[id]/page.tsx
+
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { IListing } from "@/types";
 import { 
   MapPin, Phone, Mail, Wifi, Bed, AirVent, ParkingCircle, 
-  UtensilsCrossed, Table, WashingMachine, ShieldCheck, Wrench
+  UtensilsCrossed, Table, WashingMachine, ShieldCheck, Wrench, Home, Users
 } from "lucide-react";
 import { ReactElement } from "react";
 
 async function getListing(id: string): Promise<IListing | null> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/listings/${id}`, {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+    const res = await fetch(`${apiUrl}/api/listings/${id}`, {
       cache: 'no-store'
     });
     if (!res.ok) return null;
@@ -42,8 +45,9 @@ export default async function ListingDetailPage({ params }: { params: { id: stri
     .filter(([, value]) => value === true)
     .map(([key]) => key);
     
-  // ✨ FIX: Using the variable name with the required NEXT_PUBLIC_ prefix
-const mapEmbedUrl = `https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY}&q=${encodeURIComponent(listing.address)}`;
+  // ✨ FIX: Correctly formatted Google Maps Embed URL using latitude and longitude for accuracy.
+  // The 'place' mode will drop a pin directly at the coordinates.
+  const mapEmbedUrl = `https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY}&q=${listing.latitude},${listing.longitude}&zoom=16`;
 
   return (
     <main className="bg-neutral-50">
@@ -78,30 +82,56 @@ const mapEmbedUrl = `https://www.google.com/maps/embed/v1/place?key=${process.en
             <section className="mt-8">
               <h3 className="text-xl font-bold text-neutral-800 mb-4">Details</h3>
               <div className="grid grid-cols-2 gap-4 text-neutral-700">
-                {listing.gender && <div><span className="font-semibold">Gender:</span> {listing.gender}</div>}
-                <div><span className="font-semibold">Furnishing:</span> {listing.furnished}</div>
-                <div><span className="font-semibold">Electricity:</span> Bill paid by {listing.electricityBillBy}</div>
+                {listing.listingType === 'Flat' && listing.bhkType && (
+                  <div className="flex items-center gap-2"><Home size={18} className="text-teal-600"/><span className="font-semibold">Configuration:</span> {listing.bhkType}</div>
+                )}
+                {(listing.listingType === 'PG' || listing.listingType === 'Hostel') && listing.bedsPerRoom && (
+                  <div className="flex items-center gap-2">
+                    <Bed size={18} className="text-teal-600"/>
+                    <span className="font-semibold">Room Sharing:</span>
+                    {listing.bedsPerRoom === '1' ? '1 bed' : `${listing.bedsPerRoom} beds`}
+                  </div>
+                )}
+                {/* Conditionally render gender only if it's not 'Any' */}
+                {listing.gender && listing.gender !== 'Any' && (
+                    <div className="flex items-center gap-2">
+                        <Users size={18} className="text-teal-600" />
+                        <span className="font-semibold">Preferred Gender:</span> {listing.gender}
+                    </div>
+                )}
+                <div className="flex items-center gap-2"><span className="font-semibold">Furnishing:</span> {listing.furnished}</div>
+                <div className="flex items-center gap-2"><span className="font-semibold">Electricity:</span> Bill paid by {listing.electricityBillBy}</div>
               </div>
             </section>
 
             {availableAmenities.length > 0 && (
-                <section className="mt-8">
-                    <h3 className="text-xl font-bold text-neutral-800">Amenities</h3>
-                    <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3">
-                        {availableAmenities.map((key) => (
-                            <div key={key} className="flex items-center text-neutral-700">
-                                <span className="text-teal-600">{amenityIcons[key]}</span>
-                                <span className="ml-3 font-medium capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
-                            </div>
-                        ))}
-                    </div>
-                </section>
+              <section className="mt-8">
+                  <h3 className="text-xl font-bold text-neutral-800">Amenities</h3>
+                  <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3">
+                      {availableAmenities.map((key) => (
+                          <div key={key} className="flex items-center text-neutral-700">
+                              <span className="text-teal-600">{amenityIcons[key]}</span>
+                              <span className="ml-3 font-medium capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
+                          </div>
+                      ))}
+                  </div>
+              </section>
             )}
 
+            {/* Location Section */}
             <section className="mt-8">
                 <h3 className="text-xl font-bold text-neutral-800">Location</h3>
                 <div className="mt-4 rounded-lg overflow-hidden border border-neutral-200">
-                    <iframe src={mapEmbedUrl} width="100%" height="450" style={{ border: 0 }} allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade" title="Listing Location" />
+                    <iframe 
+                      src={mapEmbedUrl} 
+                      width="100%" 
+                      height="450" 
+                      style={{ border: 0 }} 
+                      allowFullScreen 
+                      loading="lazy" 
+                      referrerPolicy="no-referrer-when-downgrade" 
+                      title="Listing Location"
+                    />
                 </div>
             </section>
           </div>
@@ -113,10 +143,10 @@ const mapEmbedUrl = `https://www.google.com/maps/embed/v1/place?key=${process.en
                     <span className="text-lg font-medium text-neutral-500">/month</span>
                 </p>
                  <div className="mt-4 space-y-2 border-t pt-4">
-                     <div className="flex justify-between items-center text-sm text-neutral-600"><span className="flex items-center gap-2"><ShieldCheck size={16}/>Deposit</span> <span className="font-medium">₹{listing.deposit.toLocaleString()}</span></div>
-                     {listing.maintenance && listing.maintenance > 0 && (
-                        <div className="flex justify-between items-center text-sm text-neutral-600"><span className="flex items-center gap-2"><Wrench size={16}/>Maintenance</span> <span className="font-medium">₹{listing.maintenance.toLocaleString()}</span></div>
-                     )}
+                      <div className="flex justify-between items-center text-sm text-neutral-600"><span className="flex items-center gap-2"><ShieldCheck size={16}/>Deposit</span> <span className="font-medium">₹{listing.deposit.toLocaleString()}</span></div>
+                      {listing.maintenance && listing.maintenance > 0 && (
+                           <div className="flex justify-between items-center text-sm text-neutral-600"><span className="flex items-center gap-2"><Wrench size={16}/>Maintenance</span> <span className="font-medium">₹{listing.maintenance.toLocaleString()}</span></div>
+                      )}
                  </div>
               <div className="mt-6 space-y-3 border-t pt-4">
                 <p className="font-semibold text-neutral-700">Contact Person: {listing.contact.name}</p>

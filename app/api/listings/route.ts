@@ -83,6 +83,8 @@ export async function POST(request: NextRequest) {
       title: formData.get('title'),
       listingType: formData.get('listingType'),
       gender: formData.get('gender'),
+      bhkType: formData.get('bhkType'),
+      bedsPerRoom: formData.get('bedsPerRoom'),
       address: formData.get('address'),
       latitude: Number(formData.get('latitude')),
       longitude: Number(formData.get('longitude')),
