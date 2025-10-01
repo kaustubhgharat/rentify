@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '../../lib/mongoose';
-import Roommate from '../../models/Roommate.ts';
+import Roommate from '../../models/Roommate';
 import { v2 as cloudinary } from 'cloudinary';
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
