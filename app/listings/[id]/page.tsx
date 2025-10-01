@@ -24,9 +24,8 @@ async function getListing(id: string): Promise<IListing | null> {
   }
 }
 
-export default async function ListingDetailPage({ params }: { params: { id: string } }) {
-  const listing = await getListing(params.id);
-
+export default async function ListingDetailPage({ params: { id } }: { params: { id: string } }) {
+   const listing = await getListing(id); 
   if (!listing) {
     notFound();
   }
