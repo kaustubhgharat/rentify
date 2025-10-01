@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Heart, MapPin, Loader2 } from "lucide-react";
 import Image from "next/image";
-import { useAuth } from "../context/AuthContext";
-import { IListing } from "../types";
+import { useAuth } from "@/app/context/AuthContext";
+import { IListing } from "@/app/types";
 import { useRouter } from "next/navigation";
 
 export default function FavoritesPage() {

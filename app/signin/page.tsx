@@ -3,7 +3,7 @@ import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { LogIn, User, Lock } from 'lucide-react';
-import { useAuth } from '../context/AuthContext'; // ✨ 1. Import useAuth
+import { useAuth } from '@/app/context/AuthContext'; // ✨ 1. Import useAuth
 
 
 export default function SignInPage() {

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Mail, Phone, Twitter, Instagram, Facebook, Heart, Building } from "lucide-react";
-import { useAuth } from "../context/AuthContext"; // Import the auth hook
+import { useAuth } from "@/app/context/AuthContext"; // Import the auth hook
 
 export default function Footer() {
   const { user, isAuthenticated } = useAuth(); // Get user session data

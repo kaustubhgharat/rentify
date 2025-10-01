@@ -3,9 +3,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Listing } from "../types";
+import { Listing } from "@/app/types";
 import { PlusCircle, Loader, AlertCircle } from "lucide-react";
-import ListingCard from "../components/ListingCard"; // <-- IMPORT THE NEW COMPONENT
+import ListingCard from "@/app/components/ListingCard"; // <-- IMPORT THE NEW COMPONENT
 import {
 Bed, 
    Wifi, ParkingSquare, UtensilsCrossed, Wind, Tv,

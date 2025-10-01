@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter, useParams } from "next/navigation";
-import { IListing } from "../../../types";
+import { IListing } from "@/app/types";
 
 const amenityOptions = [
   { key: "wifi", label: "Wi-Fi", icon: <Wifi size={20} /> },

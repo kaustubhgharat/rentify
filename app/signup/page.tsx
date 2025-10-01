@@ -3,7 +3,7 @@ import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { UserPlus, User, Lock, Mail, Building, GraduationCap } from 'lucide-react';
-import { useAuth } from '../context/AuthContext'; // ✨ 1. Import useAuth
+import { useAuth } from '@/app/context/AuthContext'; // ✨ 1. Import useAuth
 
 export default function SignUpPage() {
   const [username, setUsername] = useState('');

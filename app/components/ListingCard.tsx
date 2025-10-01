@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Listing } from "../types";
+import { Listing } from "@/app/types";
 import {
   MapPin, Wallet, Bed, Phone, ShieldCheck,
   Wrench, Wifi, ParkingSquare, UtensilsCrossed, Wind, Tv, Mail,

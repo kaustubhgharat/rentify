@@ -4,8 +4,8 @@ import { useState, useMemo, ChangeEvent, useEffect } from "react";
 import Link from "next/link";
 import { MapPin, Filter, Heart, Wind, Search } from "lucide-react";
 import Image from "next/image";
-import { IListing } from "../types";
-import { useAuth } from "../context/AuthContext"; // Import useAuth
+import { IListing } from "@/app/types";
+import { useAuth } from "@/app/context/AuthContext"; // Import useAuth
 
 
 // ✨ 1. ADD new filter properties to the initial state
