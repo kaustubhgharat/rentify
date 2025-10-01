@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import dbConnect from "../../../lib/mongoose";
-import Roommate from "../../../models/Roommate";
-import { getUserIdFromRequest } from "../../../lib/auth";
+import dbConnect from '@/app/lib/mongoose'
+import Roommate from '@/app/models/Roommate'
+import { getUserIdFromRequest } from "@/app/lib/auth";
 
 // GET a single post by its ID
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
