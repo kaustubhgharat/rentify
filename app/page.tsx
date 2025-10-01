@@ -3,6 +3,8 @@ import { Search, ShieldCheck, User, Home as HomeIcon, ArrowRight } from "lucide-
 import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
 
+export const dynamic = "force-dynamic";
+
 // This async function is correct
 const getUser = async () => {
   try {
