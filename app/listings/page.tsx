@@ -383,22 +383,26 @@ export default function ListingsPage() {
                       <span className="absolute top-3 left-3 bg-teal-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
                         {item.listingType}
                       </span>
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          toggleFavorite(item._id);
-                        }}
-                        className="absolute top-3 right-3 text-red-500 bg-white/80 backdrop-blur-sm rounded-full p-1.5 transition hover:bg-white"
-                        aria-label="Add to favorites"
-                      >
-                        <Heart
-                          size={20}
-                          fill={
-                            favorites.includes(item._id) ? "#ef4444" : "none"
-                          }
-                          strokeWidth={1.5}
-                        />
-                      </button>
+                      
+                      {/* ✨ FIX: Hide heart button if user is an owner */}
+                      {isAuthenticated && user?.role !== "owner" && (
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            toggleFavorite(item._id);
+                          }}
+                          className="absolute top-3 right-3 text-red-500 bg-white/80 backdrop-blur-sm rounded-full p-1.5 transition hover:bg-white"
+                          aria-label="Add to favorites"
+                        >
+                          <Heart
+                            size={20}
+                            fill={
+                              favorites.includes(item._id) ? "#ef4444" : "none"
+                            }
+                            strokeWidth={1.5}
+                          />
+                        </button>
+                      )}
                     </div>
                     <Link href={`/listings/${item._id}`} className="block p-4">
                       <h2 className="font-bold text-lg text-neutral-800 truncate group-hover:text-teal-600 transition">

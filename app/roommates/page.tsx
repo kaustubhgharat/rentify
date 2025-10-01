@@ -22,7 +22,8 @@ interface Filters {
 export default function ListingsPage() {
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState<Filters>({ address: "", maxRent: 5000 });
+  const [filters, setFilters] = useState<Filters>({ address: "", maxRent: 50000 });
+
   const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
 
   useEffect(() => {
