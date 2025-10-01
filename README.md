@@ -1,10 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🏠 Rentify
 
-## Getting Started
+Rentify is a modern **rental listing platform** built with [Next.js](https://nextjs.org), designed to help users find flats, PGs, and roommates easily.  
+It provides a clean UI, real-time updates, and integration with a backend database for smooth listing and search experiences.
 
-First, run the development server:
+---
+
+## 🚀 Features
+
+- 📌 Create and publish rental listings (Flats / PGs / Roommates)
+- 🗺️ Location support with Google Maps integration
+- 👤 User authentication & profile management
+- 🔎 Advanced search and filters
+- ⚡ Built using **Next.js App Router** for fast navigation
+- 🎨 Styled with **TailwindCSS** and icons via **lucide-react**
+- 🗄️ MongoDB integration for listings and users
+
+---
+
+## 🖼️ Screenshots
+
+_Add your screenshots here for better visibility._  
+
+Example:
+
+![Homepage](./screenshots/homepage.png)  
+![Roommate Listing](./screenshots/roommate-listing.png)
+
+---
+
+## 🛠️ Tech Stack
+
+- [Next.js 15](https://nextjs.org/) (App Router, Server Actions)
+- [React](https://react.dev/)
+- [TailwindCSS](https://tailwindcss.com/)
+- [MongoDB](https://www.mongodb.com/) (Atlas)
+- [Lucide Icons](https://lucide.dev/)
+- [Vercel](https://vercel.com/) for deployment
+
+---
+
+## 📦 Getting Started
+
+First, clone the repository:
 
 ```bash
+git clone https://github.com/your-username/rentify.git
+cd rentify
+
+Install dependencies:
+
+npm install
+# or
+yarn install
+# or
+pnpm install
+# or
+bun install
+
+Run the development server:
+
 npm run dev
 # or
 yarn dev
@@ -12,25 +66,6 @@ yarn dev
 pnpm dev
 # or
 bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000 with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
