@@ -69,13 +69,3 @@ bun dev
 
 Open http://localhost:3000 with your browser to see the result.
 
-
----
-
-⚙️ Environment Variables
-
-Create a .env.local file in the root of the project and add:
-
-MONGODB_URI=your_mongodb_connection_string
-NEXTAUTH_SECRET=your_secret_key
-NEXTAUTH_URL=http://localhost:3000
