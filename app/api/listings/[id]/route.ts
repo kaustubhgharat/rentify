@@ -7,6 +7,7 @@ import jwt from 'jsonwebtoken';
 
 export const dynamic = 'force-dynamic';
 
+
 export const getUserIdFromToken = async (request: NextRequest): Promise<string | null> => {
   try {
     const cookieStore = await cookies(); // async call
@@ -22,10 +23,11 @@ export const getUserIdFromToken = async (request: NextRequest): Promise<string |
 };
 
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest,
+  context: { params: { id: string } } ) {
   try {
     await connectDB();
-    const { id } = params;
+  const { id } = context.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return NextResponse.json({ success: false, error: "Invalid listing ID" }, { status: 400 });
@@ -46,11 +48,11 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
 
 // ✨ PUT (update) a listing
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest,context: { params: { id: string } }) {
     try {
         await connectDB();
         const userId = await getUserIdFromToken(request); // ✅ await here
-        const { id } = params;
+  const { id } = context.params;
 
         if (!userId) {
             return NextResponse.json({ success: false, error: "Not authenticated" }, { status: 401 });
@@ -80,12 +82,12 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 }
 
 // ✨ DELETE a listing
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, context: { params: { id: string } }) {
     try {
         await connectDB();
         const userId = await getUserIdFromToken(request); // ✅ await here
 
-        const { id } = params;
+  const { id } = context.params;
 
         if (!userId) {
             return NextResponse.json({ success: false, error: "Not authenticated" }, { status: 401 });

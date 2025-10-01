@@ -1,10 +1,10 @@
-import { NextResponse } from "next/server";
 import User from '../../../models/User';
 import connectDB from "../../../lib/mongoose";
+import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: Request, { params }: { params: { username: string } }) {
+export async function GET(request: NextRequest, { params }: { params: { username: string } }) {
   try {
     await connectDB();
     const { username } = params;
