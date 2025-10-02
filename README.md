@@ -23,7 +23,9 @@ _Add your screenshots here for better visibility._
 
 Example:
 
-![Example1](/app/public/homepage.png)
+![Example1](/public/homepage.png)
+![Example2](/public/roomate-listing.png)
+![Example3](/public/post.png)
 
 
 
