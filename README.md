@@ -22,11 +22,9 @@ It provides a clean UI, real-time updates, and integration with a backend databa
 _Add your screenshots here for better visibility._  
 
 Example:
-  
-<img src="./screenshots/homepage.png" alt="Homepage" width="500"/>
-<img src="./screenshots/roommate-listing" alt="Room Listings" width="500"/>
 
-<img src="./screenshots/post" alt="Post" width="500"/>
+![Example1](/app/public/homepage.png)
+
 
 
 ---
