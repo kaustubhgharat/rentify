@@ -18,8 +18,7 @@ export default function ListingsPage() {
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<Filters>({ address: "", maxRent: 50000 });
 
-  // ▼▼▼ REMOVED: This state is no longer needed because ListingCard handles its own modal state ▼▼▼
-  // const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
+
 
   useEffect(() => {
     async function fetchListings() {
@@ -50,18 +49,7 @@ export default function ListingsPage() {
     });
   }, [listings, filters]);
 
-  // ▼▼▼ REMOVED: This function is no longer needed ▼▼▼
-  // const handleToggleExpand = (listingId: string) => {
-  //   setExpandedCardId((currentId) => currentId === listingId ? null : listingId);
-  // };
-
-  // Placeholder function if you need admin controls
-  const handleDeleteListing = (id: string) => {
-    console.log("Deleting listing with ID:", id);
-    // Here you would make an API call to delete the listing
-    // and then update the state to remove it from the UI
-    setListings(prevListings => prevListings.filter(listing => listing._id !== id));
-  };
+ 
 
 
   if (loading) {
@@ -128,13 +116,10 @@ export default function ListingsPage() {
             {filteredListings.map((listing) => {
               const listingId = typeof listing._id === "string" ? listing._id : listing._id.toString();
               return (
-                // ▼▼▼ CORRECTED: Removed the 'isExpanded' and 'onToggleExpand' props ▼▼▼
                 <ListingCard
                   key={listingId}
                   listing={listing}
-                  // You can still pass other props like showAdminControls if needed
-                  // showAdminControls={true}
-                  // onDelete={() => handleDeleteListing(listingId)}
+                  
                 />
               );
             })}
