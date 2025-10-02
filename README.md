@@ -23,9 +23,11 @@ _Add your screenshots here for better visibility._
 
 Example:
   
-![Homepage](./screenshots/homepage.png)
-![Roommate Listing](./screenshots/roommate-listing.png)
-![post](./screenshots/post.png)
+<img src="./screenshots/homepage.png" alt="Homepage" width="500"/>
+<img src="./screenshots/roommate-listing" alt="Room Listings" width="500"/>
+
+<img src="./screenshots/post" alt="Post" width="500"/>
+
 
 ---
 
