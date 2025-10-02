@@ -1,18 +1,12 @@
-// app/roommates
-
 "use client";
 
 import { useState, useEffect, useMemo, ChangeEvent } from "react";
 import {
- PlusCircle, Users, Search,
- Bed, Wifi,
-  ParkingSquare, UtensilsCrossed, Wind, Tv, 
-  WashingMachine, 
+  PlusCircle, Users, Search,
 } from "lucide-react";
 import Link from "next/link";
 import { Listing } from "@/app/types";
-import ListingCard from "@/app/components/ListingCard"; // <-- IMPORT THE NEW COMPONENT
-
+import ListingCard from "@/app/components/ListingCard";
 
 interface Filters {
   address: string;
@@ -24,7 +18,8 @@ export default function ListingsPage() {
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<Filters>({ address: "", maxRent: 50000 });
 
-  const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
+  // ▼▼▼ REMOVED: This state is no longer needed because ListingCard handles its own modal state ▼▼▼
+  // const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchListings() {
@@ -55,19 +50,19 @@ export default function ListingsPage() {
     });
   }, [listings, filters]);
 
-  const handleToggleExpand = (listingId: string) => {
-    setExpandedCardId((currentId) => currentId === listingId ? null : listingId);
+  // ▼▼▼ REMOVED: This function is no longer needed ▼▼▼
+  // const handleToggleExpand = (listingId: string) => {
+  //   setExpandedCardId((currentId) => currentId === listingId ? null : listingId);
+  // };
+
+  // Placeholder function if you need admin controls
+  const handleDeleteListing = (id: string) => {
+    console.log("Deleting listing with ID:", id);
+    // Here you would make an API call to delete the listing
+    // and then update the state to remove it from the UI
+    setListings(prevListings => prevListings.filter(listing => listing._id !== id));
   };
 
-  const amenityIcons: { [key: string]: React.ReactNode } = {
-    wifi: <Wifi size={18} />,
-    ac: <Wind size={18} />,
-    food: <UtensilsCrossed size={18} />,
-    parking: <ParkingSquare size={18} />,
-    bed: <Bed size={18} />,
-    table: <Tv size={18} />,
-    washingMachine: <WashingMachine size={18} />,
-  };
 
   if (loading) {
     return (
@@ -89,7 +84,6 @@ export default function ListingsPage() {
           <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-600">
             Browse available flats, PGs, and find roommates in Pune.
           </p>
-          {/* ✨ Corrected link to point to the correct page */}
           <Link
             href="/roommates/add"
             className="mt-8 inline-flex items-center justify-center gap-2 px-6 py-3 bg-teal-600 text-white font-semibold rounded-full shadow-lg hover:bg-teal-700 transition-all duration-300 transform hover:scale-105"
@@ -134,13 +128,13 @@ export default function ListingsPage() {
             {filteredListings.map((listing) => {
               const listingId = typeof listing._id === "string" ? listing._id : listing._id.toString();
               return (
-                //  ▼▼▼ USE THE NEW COMPONENT HERE ▼▼▼
+                // ▼▼▼ CORRECTED: Removed the 'isExpanded' and 'onToggleExpand' props ▼▼▼
                 <ListingCard
                   key={listingId}
                   listing={listing}
-                  isExpanded={expandedCardId === listingId}
-                  onToggleExpand={() => handleToggleExpand(listingId)}
-                  // We don't pass `showAdminControls`, so it defaults to false
+                  // You can still pass other props like showAdminControls if needed
+                  // showAdminControls={true}
+                  // onDelete={() => handleDeleteListing(listingId)}
                 />
               );
             })}
