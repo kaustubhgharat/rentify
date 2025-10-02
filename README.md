@@ -1,4 +1,4 @@
-# 🏠 Rentify
+<img width="1906" height="869" alt="image" src="https://github.com/user-attachments/assets/2ce750ce-6094-4176-ac43-389e74b769b4" /># 🏠 Rentify
 
 Rentify is a modern **rental listing platform** built with [Next.js](https://nextjs.org), designed to help users find flats, PGs, and roommates easily.  
 It provides a clean UI, real-time updates, and integration with a backend database for smooth listing and search experiences.
@@ -22,9 +22,10 @@ It provides a clean UI, real-time updates, and integration with a backend databa
 _Add your screenshots here for better visibility._  
 
 Example:
-
-![Homepage](./screenshots/homepage.png)  
+  
+![Homepage](./screenshots/homepage.png)
 ![Roommate Listing](./screenshots/roommate-listing.png)
+![post](./screenshots/post.png)
 
 ---
 
