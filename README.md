@@ -19,8 +19,6 @@ It provides a clean UI, real-time updates, and integration with a backend databa
 
 ## 🖼️ Screenshots
 
-_Add your screenshots here for better visibility._  
-
 Example:
 
 ![Example1](/public/homepage.png)
