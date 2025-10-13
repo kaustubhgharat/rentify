@@ -55,7 +55,6 @@ export default function MyListingsPage() {
       });
       const data = await res.json();
       if (data.success) {
-        // Remove the listing from the state to update the UI instantly
         setListings((prev) =>
           prev.filter((listing) => listing._id !== listingId)
         );

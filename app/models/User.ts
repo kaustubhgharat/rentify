@@ -2,7 +2,6 @@ import { Schema, model, models } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
 const userSchema = new Schema({
-  // ✨ Changed 'name' to 'username' and made it unique
   username: {
     type: String,
     required: [true, 'Username is required.'],

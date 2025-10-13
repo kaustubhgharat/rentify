@@ -107,7 +107,6 @@ const FilterSidebar = ({
         </div>
       </div>
       
-      {/* Other filters... (unchanged) */}
        <div>
         <h3 className="text-sm font-medium text-neutral-700">Listing Type</h3>
         <div className="mt-2 space-y-2">
@@ -227,9 +226,7 @@ export default function ListingsPage() {
   const [filters, setFilters] = useState(initialFilters);
   const [pendingFilters, setPendingFilters] = useState(initialFilters);
   
-  // ▼▼▼ KEY CHANGE: Restored full useEffect logic for fetching data on load ▼▼▼
   useEffect(() => {
-    // Fetch all listings
     const fetchListings = async () => {
       try {
         const res = await fetch("/api/listings");
@@ -245,14 +242,12 @@ export default function ListingsPage() {
     };
     fetchListings();
 
-    // Fetch user's favorites if they are an authenticated student
     if (isAuthenticated && user?.role === "student") {
       const fetchFavorites = async () => {
         try {
             const res = await fetch("/api/favorites");
             const data = await res.json();
             if (data.success) {
-                // Store just the listing IDs for easy checking
                 setFavorites(data.favorites.map((fav: IListing) => fav._id));
             }
         } catch (error) {
