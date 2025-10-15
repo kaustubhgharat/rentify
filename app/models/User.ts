@@ -31,6 +31,10 @@ const userSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Listing' // This creates a reference to your Listing model
   }],
+  favoriteRoommates: [{
+  type: Schema.Types.ObjectId,
+  ref: 'Roommate'
+}],
 }, { timestamps: true });
 
 // Hash password before saving the user (no changes here)

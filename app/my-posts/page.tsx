@@ -109,6 +109,7 @@ export default function MyPostsPage() {
                   listing={listing}
                   showAdminControls={true} 
                   onDelete={handleDelete}
+                  hideFavoriteButton={true}
                 />
               );
             })}

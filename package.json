@@ -19,7 +19,7 @@
     "leaflet": "^1.9.4",
     "leaflet-control-geocoder": "^3.3.1",
     "leaflet-geosearch": "^4.2.2",
-    "lucide-react": "^0.544.0",
+    "lucide-react": "^0.545.0",
     "mongodb": "^6.20.0",
     "mongoose": "^8.18.3",
     "next": "15.5.3",

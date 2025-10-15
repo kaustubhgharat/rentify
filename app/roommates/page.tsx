@@ -1,9 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, ChangeEvent } from "react";
-import {
-  PlusCircle, Users, Search,
-} from "lucide-react";
+import { PlusCircle, Users, Search } from "lucide-react";
 import Link from "next/link";
 import { IRoommatePost } from "@/app/types";
 import ListingCard from "@/app/components/RoommatePostCard";
@@ -13,50 +11,80 @@ interface Filters {
   maxRent: number;
 }
 
+// Define a simple type for the favorite object
+interface Favorite {
+  _id: string;
+}
+
+// Define the shape of the entire API response for favorites
+interface FavoritesApiResponse {
+  success: boolean;
+  favorites: Favorite[];
+}
+
 export default function ListingsPage() {
   const [listings, setListings] = useState<IRoommatePost[]>([]);
+  const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<Filters>({ address: "", maxRent: 50000 });
 
-
-
   useEffect(() => {
-    async function fetchListings() {
+    async function fetchData() {
       try {
-        const res = await fetch("/api/roommates");
-        if (!res.ok) throw new Error("Failed to fetch");
-        const data = await res.json();
-        setListings(data.listings || []);
+        const [listingsRes, favoritesRes] = await Promise.all([
+          fetch("/api/roommates"),
+          fetch("/api/favoriteRoommates"),
+        ]);
+
+        if (!listingsRes.ok) throw new Error("Failed to fetch listings");
+        
+        const listingsData = await listingsRes.json();
+        setListings(listingsData.listings || []);
+        
+        if (favoritesRes.ok) {
+            // Apply the new interface to the JSON response
+            const favoritesData: FavoritesApiResponse = await favoritesRes.json();
+            if (favoritesData.success && Array.isArray(favoritesData.favorites)) {
+                // Now TypeScript knows favorites is an array of Favorite objects
+                const ids = new Set(favoritesData.favorites.map((fav) => fav._id));
+                setFavoriteIds(ids); // This is now correctly a Set<string>
+            }
+        }
+
       } catch (err) {
-        console.error("Failed to fetch listings:", err);
+        console.error("Failed to fetch data:", err);
       } finally {
         setLoading(false);
       }
     }
-    fetchListings();
+    fetchData();
   }, []);
 
-  const handleFilterChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleFilterChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: name === "maxRent" ? Number(value) : value }));
+    setFilters((prev) => ({
+      ...prev,
+      [name]: name === "maxRent" ? Number(value) : value,
+    }));
   };
 
   const filteredListings = useMemo(() => {
     return listings.filter((listing) => {
-      const addressMatch = listing.address.toLowerCase().includes(filters.address.toLowerCase());
+      const addressMatch = listing.address
+        .toLowerCase()
+        .includes(filters.address.toLowerCase());
       const rentMatch = listing.rent <= filters.maxRent;
       return addressMatch && rentMatch;
     });
   }, [listings, filters]);
 
- 
-
-
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-slate-50">
         <div className="text-center">
-          <p className="text-lg text-slate-500">Finding your perfect space...</p>
+          <p className="text-lg text-slate-500">Finding potential roommates...</p>
         </div>
       </div>
     );
@@ -67,10 +95,10 @@ export default function ListingsPage() {
       <div className="max-w-7xl mx-auto">
         <div className="text-center">
           <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-cyan-600">
-            Find Your Next Home
+            Find Your Roommate
           </h1>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-600">
-            Browse available flats, PGs, and find roommates in Pune.
+            Discover roommate posts and find the perfect match in Pune.
           </p>
           <Link
             href="/roommates/add"
@@ -94,8 +122,14 @@ export default function ListingsPage() {
             />
           </div>
           <div className="w-full md:w-1/2">
-            <label htmlFor="maxRent" className="block text-sm font-medium text-slate-700 text-center md:text-left mb-1">
-              Max Rent: <span className="font-bold text-teal-600">₹{filters.maxRent.toLocaleString()}</span>
+            <label
+              htmlFor="maxRent"
+              className="block text-sm font-medium text-slate-700 text-center md:text-left mb-1"
+            >
+              Max Rent:{" "}
+              <span className="font-bold text-teal-600">
+                ₹{filters.maxRent.toLocaleString()}
+              </span>
             </label>
             <input
               type="range"
@@ -114,12 +148,15 @@ export default function ListingsPage() {
         {filteredListings.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredListings.map((listing) => {
-              const listingId = typeof listing._id === "string" ? listing._id : listing._id.toString();
+              const listingId =
+                typeof listing._id === "string"
+                  ? listing._id
+                  : listing._id.toString();
               return (
                 <ListingCard
                   key={listingId}
                   listing={listing}
-                  
+                  initialIsFavorite={favoriteIds.has(listingId)}
                 />
               );
             })}
@@ -127,11 +164,16 @@ export default function ListingsPage() {
         ) : (
           <div className="text-center py-16 bg-white rounded-xl shadow-md border col-span-full">
             <Users size={48} className="mx-auto text-slate-400" />
-            <h3 className="mt-4 text-xl font-semibold text-slate-800">No Listings Found</h3>
-            <p className="text-slate-500 mt-2">Try adjusting your filters or check back later.</p>
+            <h3 className="mt-4 text-xl font-semibold text-slate-800">
+              No Posts Found
+            </h3>
+            <p className="text-slate-500 mt-2">
+              Try adjusting your filters or be the first to create a post!
+            </p>
           </div>
         )}
       </div>
     </main>
   );
 }
+
