@@ -183,7 +183,7 @@ export default function AddRoommatePage() {
       const data = await res.json();
 
       if (res.ok && data.success) {
-        alert('Listing published successfully!');
+        alert('post published successfully!');
         router.push('/roommates');
       } else {
         alert(`Error: ${data.error || 'Something went wrong during submission'}`);

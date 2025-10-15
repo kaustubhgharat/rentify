@@ -1,11 +1,11 @@
 // types/index.ts
 import { ObjectId } from "mongodb";
 
-export interface Listing {
+export interface IRoommatePost {
   _id: ObjectId | string; // Can be ObjectId from DB or string
   title: string;
   listingType: "Flat" | "PG";
-   bhkType?: string;      // Add this optional field
+  bhkType?: string;      // Add this optional field
   bedsPerRoom?: string;  
   gender?: "Male" | "Female" | "Any";
   address: string;

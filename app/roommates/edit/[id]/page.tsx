@@ -2,13 +2,13 @@
 
 import { useState, ChangeEvent, FormEvent, useEffect, useRef } from "react";
 import { Save } from "lucide-react";
-import { Listing } from "@/app/types";
+import { IRoommatePost } from "@/app/types";
 import { useRouter, useParams } from 'next/navigation';
 import { Loader } from "lucide-react";
 
 // The form data type, excluding fields that shouldn't be edited directly.
 // Note: We are not handling image re-uploads in this form for simplicity.
-type EditFormData = Omit<Listing, '_id' | 'imageUrls' | 'createdAt' | 'userId' | 'updatedAt'>;
+type EditFormData = Omit<IRoommatePost, '_id' | 'imageUrls' | 'createdAt' | 'userId' | 'updatedAt'>;
 
 export default function EditListingPage() {
   // State for the form, initialized to null until data is fetched

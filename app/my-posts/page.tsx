@@ -3,20 +3,15 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Listing } from "@/app/types";
+import { IRoommatePost } from "@/app/types";
 import { PlusCircle, Loader, AlertCircle } from "lucide-react";
-import ListingCard from "@/app/components/ListingCard"; // <-- IMPORT THE NEW COMPONENT
-import {
-Bed, 
-   Wifi, ParkingSquare, UtensilsCrossed, Wind, Tv,
-  WashingMachine, 
-} from "lucide-react";
+import ListingCard from "@/app/components/RoommatePostCard"; // <-- IMPORT THE NEW COMPONENT
+
 
 export default function MyPostsPage() {
-  const [posts, setPosts] = useState<Listing[]>([]);
+  const [posts, setPosts] = useState<IRoommatePost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
 
   useEffect(() => {
     // ... (your fetchMyPosts function remains the same)
@@ -42,12 +37,8 @@ export default function MyPostsPage() {
     fetchMyPosts();
   }, []);
 
-  const handleToggleExpand = (listingId: string) => {
-    setExpandedCardId((currentId) => (currentId === listingId ? null : listingId));
-  };
   
   const handleDelete = async (postId: string) => {
-    // ... (your handleDelete function remains the same)
     if (!confirm("Are you sure you want to delete this post?")) {
       return;
     }
@@ -64,15 +55,6 @@ export default function MyPostsPage() {
     } catch (error) {
       alert((error as Error).message);
     }
-  };
-  const amenityIcons: { [key: string]: React.ReactNode } = {
-    wifi: <Wifi size={18} />,
-    ac: <Wind size={18} />,
-    food: <UtensilsCrossed size={18} />,
-    parking: <ParkingSquare size={18} />,
-    bed: <Bed size={18} />,
-    table: <Tv size={18} />,
-    washingMachine: <WashingMachine size={18} />,
   };
 
   if (loading) {
@@ -125,9 +107,7 @@ export default function MyPostsPage() {
                 <ListingCard
                   key={listingId}
                   listing={listing}
-                  isExpanded={expandedCardId === listingId}
-                  onToggleExpand={() => handleToggleExpand(listingId)}
-                  showAdminControls={true} // <-- Show Edit/Delete buttons
+                  showAdminControls={true} 
                   onDelete={handleDelete}
                 />
               );

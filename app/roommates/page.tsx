@@ -5,8 +5,8 @@ import {
   PlusCircle, Users, Search,
 } from "lucide-react";
 import Link from "next/link";
-import { Listing } from "@/app/types";
-import ListingCard from "@/app/components/ListingCard";
+import { IRoommatePost } from "@/app/types";
+import ListingCard from "@/app/components/RoommatePostCard";
 
 interface Filters {
   address: string;
@@ -14,7 +14,7 @@ interface Filters {
 }
 
 export default function ListingsPage() {
-  const [listings, setListings] = useState<Listing[]>([]);
+  const [listings, setListings] = useState<IRoommatePost[]>([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<Filters>({ address: "", maxRent: 50000 });
 

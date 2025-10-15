@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Listing } from "@/app/types";
+import { IRoommatePost } from "@/app/types";
 import {
   MapPin, Wallet, Bed, Phone, ShieldCheck,
   Wrench, Wifi, ParkingSquare, UtensilsCrossed, Wind, Tv, Mail,
@@ -12,9 +12,10 @@ import { useEffect, useState } from "react";
 
 // Define the props the component will accept
 interface ListingCardProps {
-  listing: Listing;
+  listing: IRoommatePost;
   showAdminControls?: boolean; // This prop controls the Edit/Delete buttons
   onDelete?: (id: string) => void; // Pass the delete handler
+  isExpanded?: boolean; // 👈 Add this
 }
 
 // A map of amenity keys to their corresponding icons
