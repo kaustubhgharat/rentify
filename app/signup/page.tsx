@@ -24,8 +24,62 @@ export default function SignUpPage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
+
+    // ✅ Email syntax regex
+    const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+
+    if (username.trim().length < 3) {
+      setError("Username must be at least 3 characters long.");
+      return;
+    }
+
+    if (!emailRegex.test(email.trim())) {
+      setError("Please enter a valid email address (e.g., example@gmail.com).");
+      return;
+    }
+
+    // ✅ Detect common domain typos
+    const domain = email.split("@")[1]?.toLowerCase();
+    const commonDomains = [
+      "gmail.com",
+      "yahoo.com",
+      "outlook.com",
+      "hotmail.com",
+      "icloud.com",
+      "edu.in",
+      "ac.in",
+    ];
+    const likelyTypos = [
+      "gmial.com",
+      "gamil.com",
+      "gmal.com",
+      "yaho.com",
+      "hotmal.com",
+    ];
+
+    if (likelyTypos.includes(domain)) {
+      setError(
+        `Did you mean "${domain.replace(
+          "gmial.com",
+          "gmail.com"
+        )}"? Please correct your email.`
+      );
+      return;
+    }
+
+    // Optional: Only allow realistic domain endings (no ".cmo" etc.)
+    if (!/\.[a-z]{2,}$/i.test(domain)) {
+      setError("Please enter a valid domain (e.g., .com, .in, .edu).");
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters long.");
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const res = await fetch("/api/auth/signup", {
@@ -36,10 +90,9 @@ export default function SignUpPage() {
 
       const data = await res.json();
       if (res.ok && data.success) {
-        // On successful signup, redirect to the signin page to log in
-        alert("Account created successfully! ");
+        alert("Account created successfully!");
         login(data.user);
-        // Now redirect
+
         if (data.user.role === "owner") {
           router.push("/listings/add");
         } else {
@@ -49,7 +102,7 @@ export default function SignUpPage() {
         setError(data.error || "Something went wrong.");
       }
     } catch (err) {
-      console.log(err);
+      console.error(err);
       setError("An error occurred. Please try again.");
     } finally {
       setLoading(false);
