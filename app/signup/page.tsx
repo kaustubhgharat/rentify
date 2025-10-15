@@ -24,38 +24,8 @@ export default function SignUpPage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setError("");
-
-    // ✅ Basic validation before hitting the server
-    if (!username.trim()) {
-      setError("Username is required.");
-      return;
-    }
-
-    if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
-      setError(
-        "Username must be 3–20 characters, letters/numbers/underscore only."
-      );
-      return;
-    }
-
-    if (!email.endsWith("@gmail.com")) {
-      setError("Email must be a valid Gmail address.");
-      return;
-    }
-
-    if (
-      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
-        password
-      )
-    ) {
-      setError(
-        "Password must be at least 8 characters, include uppercase, lowercase, number & special character."
-      );
-      return;
-    }
-
     setLoading(true);
+    setError("");
 
     try {
       const res = await fetch("/api/auth/signup", {
@@ -65,11 +35,16 @@ export default function SignUpPage() {
       });
 
       const data = await res.json();
-
       if (res.ok && data.success) {
-        alert("Account created successfully!");
+        // On successful signup, redirect to the signin page to log in
+        alert("Account created successfully! ");
         login(data.user);
-        router.push(data.user.role === "owner" ? "/listings/add" : "/listings");
+        // Now redirect
+        if (data.user.role === "owner") {
+          router.push("/listings/add");
+        } else {
+          router.push("/listings");
+        }
       } else {
         setError(data.error || "Something went wrong.");
       }
