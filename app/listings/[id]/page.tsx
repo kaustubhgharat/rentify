@@ -20,13 +20,12 @@ import {
   Users,
 } from "lucide-react";
 import { ReactElement } from "react";
+import { ListingReviews } from "@/app/components/reviews/ListingReviews"; 
 
 async function getListing(id: string): Promise<IListing | null> {
   try {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
-    const res = await fetch(`${apiUrl}/api/listings/${id}`, {
-      cache: "no-store",
-    });
+    const res = await fetch(`${apiUrl}/api/listings/${id}`, { cache: "no-store" });
     if (!res.ok) return null;
     const data = await res.json();
     return data.listing;
@@ -60,8 +59,6 @@ export default async function ListingDetailPage({
     .filter(([, value]) => value === true)
     .map(([key]) => key);
 
-  // ✨ FIX: Correctly formatted Google Maps Embed URL using latitude and longitude for accuracy.
-  // The 'place' mode will drop a pin directly at the coordinates.
   const mapEmbedUrl = `https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY}&q=${listing.latitude},${listing.longitude}&zoom=16`;
 
   return (
@@ -198,6 +195,7 @@ export default async function ListingDetailPage({
                 />
               </div>
             </section>
+            <ListingReviews listingId={listing._id} />
           </div>
 
           <aside className="lg:col-span-1">

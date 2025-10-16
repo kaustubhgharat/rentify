@@ -41,6 +41,7 @@ const listingSchema = new Schema({
   amenities: amenitiesSchema,
   imageUrls: { type: [String], required: true },
   contact: contactSchema,
+  reviews: [{ type: Schema.Types.ObjectId, ref: 'Review' }]
 }, { timestamps: true });
 
 const Listing = models.Listing || model('Listing', listingSchema);

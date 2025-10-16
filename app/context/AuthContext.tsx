@@ -4,7 +4,7 @@ import { createContext, useState, useEffect, useContext, ReactNode } from 'react
 
 // The User interface should match the data structure of your user model.
 interface User {
-  id: string;
+  _id: string;
   username: string;
   email: string;
   role: 'student' | 'owner';

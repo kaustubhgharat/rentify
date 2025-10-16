@@ -11,13 +11,11 @@ export const getUserIdFromToken = async (
   request: NextRequest
 ): Promise<string | null> => {
   try {
-    const cookieStore = await cookies(); // async call
+    const cookieStore = await cookies();
     const token = cookieStore.get("token")?.value;
     if (!token) return null;
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
-      id: string;
-    };
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: string };
     return decoded.id;
   } catch (error) {
     console.error("Token verification failed:", error);
@@ -25,27 +23,30 @@ export const getUserIdFromToken = async (
   }
 };
 
+// --- GET listing by ID ---
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } } // ✅ Correct signature
+  { params }: { params: { listingId: string } }
 ) {
   try {
     await connectDB();
-    const { id } = params; // ✅ Correct usage
+    const { listingId } = params;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
+    if (!mongoose.Types.ObjectId.isValid(listingId)) {
       return NextResponse.json(
         { success: false, error: "Invalid listing ID format" },
         { status: 400 }
       );
     }
-    const listing = await Listing.findById(id);
+
+    const listing = await Listing.findById(listingId);
     if (!listing) {
       return NextResponse.json(
         { success: false, error: "Listing not found" },
         { status: 404 }
       );
     }
+
     return NextResponse.json({ success: true, listing });
   } catch (error) {
     console.error("Error fetching listing:", error);
@@ -56,14 +57,15 @@ export async function GET(
   }
 }
 
+// --- UPDATE a listing ---
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } } // ✅ FIX: Changed 'context' to the correct signature
+  { params }: { params: { listingId: string } }
 ) {
   try {
     await connectDB();
     const userId = await getUserIdFromToken(request);
-    const { id } = params; // ✅ FIX: Use 'id' from the correctly destructured params
+    const { listingId } = params;
 
     if (!userId) {
       return NextResponse.json(
@@ -71,14 +73,15 @@ export async function PUT(
         { status: 401 }
       );
     }
-    if (!mongoose.Types.ObjectId.isValid(id)) {
+
+    if (!mongoose.Types.ObjectId.isValid(listingId)) {
       return NextResponse.json(
         { success: false, error: "Invalid listing ID" },
         { status: 400 }
       );
     }
 
-    const listing = await Listing.findById(id);
+    const listing = await Listing.findById(listingId);
     if (!listing) {
       return NextResponse.json(
         { success: false, error: "Listing not found" },
@@ -99,7 +102,8 @@ export async function PUT(
     if (updatedData.availableBeds > updatedData.bedsPerRoom) {
       updatedData.availableBeds = updatedData.bedsPerRoom;
     }
-    const updatedListing = await Listing.findByIdAndUpdate(id, updatedData, {
+
+    const updatedListing = await Listing.findByIdAndUpdate(listingId, updatedData, {
       new: true,
     });
 
@@ -116,12 +120,12 @@ export async function PUT(
 // --- DELETE a listing ---
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } } // ✅ FIX: Changed 'context' to the correct signature
+  { params }: { params: { listingId: string } }
 ) {
   try {
     await connectDB();
     const userId = await getUserIdFromToken(request);
-    const { id } = params; // ✅ FIX: Use 'id' from the correctly destructured params
+    const { listingId } = params;
 
     if (!userId) {
       return NextResponse.json(
@@ -129,14 +133,15 @@ export async function DELETE(
         { status: 401 }
       );
     }
-    if (!mongoose.Types.ObjectId.isValid(id)) {
+
+    if (!mongoose.Types.ObjectId.isValid(listingId)) {
       return NextResponse.json(
         { success: false, error: "Invalid listing ID" },
         { status: 400 }
       );
     }
 
-    const listing = await Listing.findById(id);
+    const listing = await Listing.findById(listingId);
     if (!listing) {
       return NextResponse.json(
         { success: false, error: "Listing not found" },
@@ -151,7 +156,7 @@ export async function DELETE(
       );
     }
 
-    await Listing.findByIdAndDelete(id);
+    await Listing.findByIdAndDelete(listingId);
 
     return NextResponse.json({
       success: true,
