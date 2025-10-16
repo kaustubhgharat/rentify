@@ -40,7 +40,8 @@ export interface IListing {
   title: string;
   listingType: 'PG' | 'Flat' | 'Hostel';
   bhkType?: string;      // Add this optional field
-  bedsPerRoom?: string;  // Add this optional field
+  bedsPerRoom?: number;  // Add this optional field
+  availableBeds?:number;
   gender?: "Male" | "Female" | "Any";
   address: string;
   latitude?: number;

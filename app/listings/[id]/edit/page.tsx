@@ -1,3 +1,4 @@
+// app/listings/[id]/edit/page.tsx
 "use client";
 
 import { useState, ChangeEvent, FormEvent, useEffect, useRef } from "react";
@@ -70,7 +71,7 @@ export default function EditListingPage() {
     fetchListingData();
   }, [id, router]);
   // ✨ 2. New handler for when the marker is dragged on the map
-  
+
   useEffect(() => {
     if (
       typeof window.google === "undefined" ||
@@ -135,9 +136,11 @@ export default function EditListingPage() {
       });
     });
   }, [form]);
-  
+
   // Your form handlers are mostly the same
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setForm((prev) => (prev ? { ...prev, [name]: value } : null));
   };
@@ -192,7 +195,6 @@ export default function EditListingPage() {
   }
 
   return (
-
     <main className="bg-neutral-50 min-h-screen py-12 px-4">
       <div className="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-lg border border-neutral-200/80">
         <h1 className="text-3xl font-bold text-neutral-900 mb-2">
@@ -265,12 +267,61 @@ export default function EditListingPage() {
               </div>
             )}
           </div>
-
-         {/* Address Search & Map Section */}
           <div>
-            <label htmlFor="address-autocomplete" className="block text-sm font-medium text-neutral-700">Search Address</label>
-            <input ref={autocompleteRef} id="address-autocomplete" type="text" required onChange={(e) => setForm({ ...form, address: e.target.value })} value={form.address} placeholder="Start typing your property address..." className="mt-1 block w-full border-neutral-300 rounded-lg shadow-sm py-2 px-3 focus:ring-2 focus:ring-teal-500 transition" />
-            <label className="block text-sm font-medium text-neutral-700 mt-6 mb-2">Pin Location on Map (Drag the pin to be precise)</label>
+            <label
+              htmlFor="availableBeds"
+              className="block text-sm font-medium text-neutral-700"
+            >
+              Available Beds
+            </label>
+            <input
+              type="number"
+              id="availableBeds"
+              name="availableBeds"
+              min={0}
+              max={form.bedsPerRoom || 0} // ✨ cannot exceed bedsPerRoom
+              required
+              value={form.availableBeds || 0}
+              onChange={(e) => {
+                const val = Number(e.target.value);
+                setForm((prev) =>
+                  prev
+                    ? {
+                        ...prev,
+                        availableBeds: Math.min(val, prev.bedsPerRoom??0),
+                      }
+                    : null
+                );
+              }}
+              placeholder="Enter number of available beds"
+              className="mt-1 block w-full border-neutral-300 rounded-lg shadow-sm py-2 px-3 focus:ring-2 focus:ring-teal-500 transition"
+            />
+            <p className="text-xs text-neutral-500 mt-1">
+              Cannot exceed total beds per room ({form.bedsPerRoom || 0})
+            </p>
+          </div>
+
+          {/* Address Search & Map Section */}
+          <div>
+            <label
+              htmlFor="address-autocomplete"
+              className="block text-sm font-medium text-neutral-700"
+            >
+              Search Address
+            </label>
+            <input
+              ref={autocompleteRef}
+              id="address-autocomplete"
+              type="text"
+              required
+              onChange={(e) => setForm({ ...form, address: e.target.value })}
+              value={form.address}
+              placeholder="Start typing your property address..."
+              className="mt-1 block w-full border-neutral-300 rounded-lg shadow-sm py-2 px-3 focus:ring-2 focus:ring-teal-500 transition"
+            />
+            <label className="block text-sm font-medium text-neutral-700 mt-6 mb-2">
+              Pin Location on Map (Drag the pin to be precise)
+            </label>
             <div ref={mapRef} className="w-full h-80 rounded-lg border" />
           </div>
           {/* Financial & Furnishing Details */}
@@ -389,7 +440,9 @@ export default function EditListingPage() {
 
           {/* Amenities */}
           <div>
-            <label className="block text-sm font-medium text-neutral-700">Amenities</label>
+            <label className="block text-sm font-medium text-neutral-700">
+              Amenities
+            </label>
             <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
               {amenityOptions.map(({ key, label, icon }) => (
                 // 3. ✨ THE BUTTON: Calls the toggleAmenity function when clicked.
@@ -505,6 +558,5 @@ export default function EditListingPage() {
         </form>
       </div>
     </main>
-
   );
 }

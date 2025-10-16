@@ -26,7 +26,8 @@ const listingSchema = new Schema({
   title: { type: String, required: [true, 'Title is required.'] },
   listingType: { type: String, enum: ['PG', 'Flat', 'Hostel'], required: true },
  bhkType: { type: String },      // For 'Flat' type
-  bedsPerRoom: { type: String },
+  bedsPerRoom: { type: Number }, // total beds in a room
+  availableBeds: { type: Number },
   gender: { type: String, enum: ['Male', 'Female', 'Any'] },
   address: { type: String, required: [true, 'Address is required.'] },
   latitude: { type: Number },
