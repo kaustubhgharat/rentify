@@ -7,7 +7,6 @@ import { IRoommatePost } from "@/app/types";
 import { PlusCircle, Loader, AlertCircle } from "lucide-react";
 import ListingCard from "@/app/components/RoommatePostCard"; // <-- IMPORT THE NEW COMPONENT
 
-
 export default function MyPostsPage() {
   const [posts, setPosts] = useState<IRoommatePost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -80,10 +79,10 @@ export default function MyPostsPage() {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-cyan-600">
-            My Posted Listings
+            My Posts
           </h1>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-600">
-            Here are all the listings you have created.
+            Here are all the posts you have created.
           </p>
         </div>
 

@@ -34,7 +34,11 @@ const userSchema = new Schema({
   favoriteRoommates: [{
   type: Schema.Types.ObjectId,
   ref: 'Roommate'
-}],
+}],// Add these fields to your userSchema in User.ts
+profilePhotoUrl: { type: String, default: '' },
+bio: { type: String, default: '', maxLength: 2500 },
+phone: { type: String, default: '' },
+location: { type: String, default: '' },
 }, { timestamps: true });
 
 // Hash password before saving the user (no changes here)

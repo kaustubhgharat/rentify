@@ -10,62 +10,86 @@ export async function POST(request: NextRequest) {
     await connectDB();
     const { username, password } = await request.json();
 
-    // Validate that username and password were provided
+    // 1. Validate Input: Ensure username and password are provided
     if (!username || !password) {
-      return NextResponse.json({ success: false, error: "Please provide username and password." }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: "Username and password are required." },
+        { status: 400 }
+      );
     }
 
-    // Find the user by their username and include the password for comparison
+    // 2. Find User: Locate the user by their username
+    // We use .select('+password') because the password field is excluded by default in the schema
     const user = await User.findOne({ username }).select('+password');
     
-    // ✨ FIX 1: Specific error if the username is not found
+    // Handle case where the username does not exist
     if (!user) {
-      return NextResponse.json({ success: false, error: "User not found." }, { status: 404 });
+      return NextResponse.json(
+        { success: false, error: "Invalid credentials." }, // Use a generic message for security
+        { status: 401 }
+      );
     }
 
-    // Compare the provided password with the hashed password in the database
-    const isMatch = await bcrypt.compare(password, user.password);
+    // 3. Verify Password: Compare the provided password with the stored hash
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
 
-    // ✨ FIX 2: Specific error if the password is a mismatch
-    if (!isMatch) {
-      return NextResponse.json({ success: false, error: "Incorrect password." }, { status: 401 });
+    // Handle case where the password is incorrect
+    if (!isPasswordCorrect) {
+      return NextResponse.json(
+        { success: false, error: "Invalid credentials." }, // Use a generic message for security
+        { status: 401 }
+      );
     }
 
-    // --- Successful Login Logic (remains the same) ---
-    // Create the payload for the JWT token
-    const payload = {
-      id: user._id,
+    // --- THE FIX: PREPARE FULL USER DATA ---
+    // Create a 'clean' user object to send to the frontend.
+    // This includes all profile details but EXCLUDES the password hash.
+    const userToReturn = {
+      id: user._id.toString(),
       username: user.username,
       email: user.email,
       role: user.role,
+      profilePhotoUrl: user.profilePhotoUrl,
+      bio: user.bio,
+      phone: user.phone,
+      location: user.location,
     };
 
-    // Sign the token with your secret key, setting it to expire in 1 day
-    const token = jwt.sign(payload, process.env.JWT_SECRET!, {
-      expiresIn: '1d',
+    // 4. Create JWT Token: The token payload should be minimal
+    const tokenPayload = {
+      id: user._id,
+      role: user.role,
+    };
+
+    const token = jwt.sign(tokenPayload, process.env.JWT_SECRET!, {
+      expiresIn: '1d', // Token expires in one day
     });
     
-    // Create a successful JSON response
+    // 5. Create Response: Send the full user object back to the client
     const response = NextResponse.json({
         success: true,
         message: "Logged in successfully.",
-        user: payload
+        user: userToReturn // This now contains all profile data
     }, { status: 200 });
 
-    // Set the token in a secure, httpOnly cookie. This is crucial for authentication.
+    // 6. Set Secure Cookie: The token is stored in an httpOnly cookie for security
     response.cookies.set('token', token, {
-        httpOnly: true, // The cookie cannot be accessed by client-side JavaScript
-        secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
-        sameSite: 'strict', // Helps prevent CSRF attacks
-        maxAge: 60 * 60 * 24, // 1 day expiration
-        path: '/', // The cookie is available for all pages
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 60 * 60 * 24, // 1 day
+        path: '/',
     });
 
-    // Return the response to the client
     return response;
 
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
-    return NextResponse.json({ success: false, error: `Server error: ${errorMessage}` }, { status: 500 });
+    // 7. Robust Error Handling
+    console.error("[LOGIN_API_ERROR]", error);
+    return NextResponse.json(
+      { success: false, error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }
+

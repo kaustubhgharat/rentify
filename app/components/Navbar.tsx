@@ -1,35 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, LogOut, User } from "lucide-react";
+import { Menu, X, LogOut } from "lucide-react";
 import { useAuth } from "@/app/context/AuthContext";
 
-const NavLink = ({
-  href,
-  children,
-}: {
-  href: string;
-  children: React.ReactNode;
-}) => {
+const NavLink = ({ href, children }: { href: string; children: React.ReactNode; }) => {
   const pathname = usePathname();
   const isActive = pathname === href;
   return (
-    <Link
-      href={href}
-      className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-        isActive
-          ? "bg-teal-50 text-teal-600 font-semibold"
-          : "text-neutral-700 hover:bg-neutral-100 hover:text-teal-600"
-      }`}
-    >
+    <Link href={href} className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive ? "bg-teal-50 text-teal-600 font-semibold" : "text-neutral-700 hover:bg-neutral-100 hover:text-teal-600"}`}>
       {children}
     </Link>
   );
 };
 
-// This is a static placeholder component
 const NavLinksSkeleton = () => (
   <>
     <div className="h-6 w-20 bg-gray-200 rounded-md animate-pulse" />
@@ -40,14 +26,11 @@ const NavLinksSkeleton = () => (
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-
-  // ✨ FIX: Add a state to track if the component has mounted on the client
-  const [isMounted, setIsMounted] = useState(false);
   const { user, isAuthenticated, loading, logout } = useAuth();
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  // *** REMOVED ***
+  // The localStorage listener is no longer needed. The component will automatically
+  // re-render whenever the `user` object in AuthContext changes.
 
   const allNavLinks = [
     { href: "/listings", label: "Find Room", roles: ["student", "owner"] },
@@ -72,8 +55,7 @@ export default function Navbar() {
           </Link>
 
           <div className="hidden md:flex items-center space-x-2">
-            {/* ✨ FIX: Render skeleton if not mounted or if auth is loading */}
-            {!isMounted || loading ? (
+            {loading ? (
               <NavLinksSkeleton />
             ) : (
               visibleLinks.map((link) => (
@@ -85,16 +67,27 @@ export default function Navbar() {
           </div>
 
           <div className="hidden md:flex items-center space-x-4">
-            {!isMounted ? (
+            {loading ? (
               <div className="h-10 w-24 bg-gray-200 rounded-full animate-pulse" />
-            ) : isAuthenticated ? (
+            ) : isAuthenticated && user ? (
               <>
-                {/* ✨ FIX: Use the user's username to create the dynamic link */}
                 <Link
                   href={`/profile`}
-                  className="text-sm font-semibold text-neutral-700 hover:text-teal-600 flex items-center gap-2"
+                  className="flex items-center gap-3 text-sm font-semibold text-neutral-700 hover:text-teal-600"
                 >
-                  <User size={16} /> Profile
+                  {user.profilePhotoUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={user.profilePhotoUrl}
+                      alt="Profile"
+                      className="w-9 h-9 rounded-full object-cover border-2 border-teal-500"
+                    />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center font-bold uppercase border-2 border-teal-500">
+                      {user.username?.charAt(0)}
+                    </div>
+                  )}
+                  <span>Profile</span>
                 </Link>
 
                 <button
@@ -106,16 +99,10 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <Link
-                  href="/signin"
-                  className="px-4 py-2 text-sm font-medium text-neutral-700 hover:text-teal-600"
-                >
+                <Link href="/signin" className="px-4 py-2 text-sm font-medium text-neutral-700 hover:text-teal-600">
                   Sign In
                 </Link>
-                <Link
-                  href="/signup"
-                  className="px-4 py-2 text-sm font-medium text-white bg-teal-600 rounded-full hover:bg-teal-700 transition"
-                >
+                <Link href="/signup" className="px-4 py-2 text-sm font-medium text-white bg-teal-600 rounded-full hover:bg-teal-700 transition">
                   Sign Up
                 </Link>
               </>
@@ -135,25 +122,19 @@ export default function Navbar() {
 
       <div className={`md:hidden ${isOpen ? "block" : "hidden"}`}>
         <div className="px-2 pt-2 pb-4 space-y-1 sm:px-3 bg-white border-t">
-          {!isMounted || loading ? (
+          {loading ? (
             <div className="p-3">
               <div className="h-6 w-3/4 bg-gray-200 rounded-md animate-pulse"></div>
             </div>
           ) : (
             visibleLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setIsOpen(false)}
-                className="block px-3 py-2 rounded-md text-base font-medium"
-              >
+              <Link key={link.href} href={link.href} onClick={() => setIsOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium">
                 {link.label}
               </Link>
             ))
           )}
-
           <div className="pt-4 mt-4 border-t border-neutral-200">
-            {!isMounted ? (
+            {loading ? (
               <div className="p-3">
                 <div className="h-8 w-1/2 bg-gray-200 rounded-md animate-pulse"></div>
               </div>
@@ -169,18 +150,10 @@ export default function Navbar() {
               </button>
             ) : (
               <>
-                <Link
-                  href="/signin"
-                  onClick={() => setIsOpen(false)}
-                  className="block px-3 py-2 rounded-md text-base font-medium"
-                >
+                <Link href="/signin" onClick={() => setIsOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium">
                   Sign In
                 </Link>
-                <Link
-                  href="/signup"
-                  onClick={() => setIsOpen(false)}
-                  className="block px-3 py-2 rounded-md text-base font-medium"
-                >
+                <Link href="/signup" onClick={() => setIsOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium">
                   Sign Up
                 </Link>
               </>
