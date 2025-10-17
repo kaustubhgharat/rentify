@@ -216,7 +216,8 @@ export default async function ListingDetailPage({
                     ₹{listing.deposit.toLocaleString()}
                   </span>
                 </div>
-                {listing.maintenance && listing.maintenance > 0 && (
+                {/* ✨ THIS IS THE FIX ✨ */}
+                {listing.maintenance != null && (
                   <div className="flex justify-between items-center text-sm text-neutral-600">
                     <span className="flex items-center gap-2">
                       <Wrench size={16} />
