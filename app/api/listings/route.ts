@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
 import Listing from "../../models/Listing";
 import connectDB from "../../lib/mongoose";
-import { cookies } from "next/headers"; // Import cookies
+import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 
 export const dynamic = "force-dynamic";
@@ -13,7 +13,6 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Helper function to upload a file to Cloudinary (this function does not change)
 const uploadToCloudinary = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = file.stream().getReader();
@@ -45,7 +44,6 @@ const uploadToCloudinary = (file: File): Promise<string> => {
   });
 };
 
-// GET all listings
 export async function GET() {
   try {
     await connectDB();
@@ -60,7 +58,6 @@ export async function GET() {
   }
 }
 
-// POST a new listing
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
@@ -77,7 +74,6 @@ export async function POST(request: NextRequest) {
       role: string;
     };
 
-    // Only owners can create listings
     if (decodedToken.role !== "owner") {
       return NextResponse.json(
         { success: false, error: "Only owners can create listings." },

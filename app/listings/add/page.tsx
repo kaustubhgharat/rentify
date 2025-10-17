@@ -31,12 +31,11 @@ const amenityOptions = [
   },
 ] as const;
 
-// ✨ State now includes bhkType and bedsPerRoom
 const initialFormState = {
   title: "",
   listingType: "PG" as "PG" | "Flat" | "Hostel",
   gender: "Any" as "Male" | "Female" | "Any",
-  bhkType: "1 BHK", // Default value for Flat
+  bhkType: "1 BHK", 
   bedsPerRoom: 2,
   availableBeds: 2,
   address: "",
@@ -72,28 +71,23 @@ export default function AddListingPage() {
   const mapRef = useRef<HTMLDivElement>(null);
   const autocompleteRef = useRef<HTMLInputElement>(null);
   const [isApiLoaded, setIsApiLoaded] = useState(false);
-  // ✨ REVISED: This useEffect is now safe for React Strict Mode
+
   useEffect(() => {
     const scriptId = "google-maps-script";
 
-    // 1. Check if the script tag already exists in the document
     const existingScript = document.getElementById(scriptId);
 
-    // Also check if window.google is already available
     if (window.google) {
       setIsApiLoaded(true);
       return;
     }
 
-    // If the script already exists but window.google isn't ready, we wait.
-    // The `onload` event on the existing script will handle setting the state.
     if (existingScript) {
       return;
     }
 
-    // 2. If it doesn't exist, create and append it
     const script = document.createElement("script");
-    script.id = scriptId; // Add an ID to easily find it later
+    script.id = scriptId;
     script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY}&libraries=places,marker`;
     script.async = true;
     script.defer = true;
@@ -151,12 +145,11 @@ export default function AddListingPage() {
 
       map.setCenter(location);
       map.setZoom(16);
-      marker.position = { lat, lng }; // Update marker's position property
+      marker.position = { lat, lng }; 
     });
 
-    // Note: the event name is "gmp-dragend"
     marker.addListener("gmp-dragend", () => {
-      const pos = marker.position as google.maps.LatLng; // The position will be a LatLng object
+      const pos = marker.position as google.maps.LatLng;
       if (!pos) return;
       setForm((prev) => ({
         ...prev,
@@ -166,14 +159,13 @@ export default function AddListingPage() {
     });
   }, [isApiLoaded]);
 
-  // ✨ Simplified handler for both top-level and nested contact fields
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
 
     if (name === "bedsPerRoom") {
-      const numericValue = value === "5+" ? 5 : Number(value); // Convert to number
+      const numericValue = value === "5+" ? 5 : Number(value); 
       setForm((prev) => ({
         ...prev,
         bedsPerRoom: numericValue,
@@ -215,7 +207,6 @@ export default function AddListingPage() {
     setForm((prev) => ({ ...prev, images: [...prev.images, ...newFiles] }));
   };
 
-  // ✨ Fully implemented submit handler
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (form.images.length === 0) {
@@ -225,7 +216,6 @@ export default function AddListingPage() {
     setIsSubmitting(true);
 
     const formData = new FormData();
-    // Loop through form state and append to formData
     Object.entries(form).forEach(([key, value]) => {
       if (key === "images") {
         form.images.forEach((file) => formData.append("images", file));

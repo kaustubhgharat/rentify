@@ -1,6 +1,5 @@
 import mongoose, { Mongoose } from 'mongoose';
 
-// ✨ Read both URI and DB name from environment variables
 const MONGODB_BASE_URI = process.env.MONGO_URI;
 const MONGODB_DB_NAME = process.env.MONGO_DB;
 
@@ -11,7 +10,6 @@ if (!MONGODB_DB_NAME) {
   throw new Error('Please define the MONGO_DB environment variable inside .env.local');
 }
 
-// ✨ Combine them to create the full, correct connection string
 const MONGODB_URI = `${MONGODB_BASE_URI}${MONGODB_DB_NAME}`;
 
 interface MongooseCache {
@@ -39,7 +37,6 @@ async function connectDB() {
       bufferCommands: false,
     };
 
-    // Use the full, combined URI to connect
     cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongooseInstance) => {
       return mongooseInstance;
     });

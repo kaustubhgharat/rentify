@@ -106,8 +106,8 @@ const FilterSidebar = ({
           </div>
         </div>
       </div>
-      
-       <div>
+
+      <div>
         <h3 className="text-sm font-medium text-neutral-700">Listing Type</h3>
         <div className="mt-2 space-y-2">
           {Object.keys(pendingFilters.types).map((type) => (
@@ -225,7 +225,7 @@ export default function ListingsPage() {
   const [favorites, setFavorites] = useState<string[]>([]);
   const [filters, setFilters] = useState(initialFilters);
   const [pendingFilters, setPendingFilters] = useState(initialFilters);
-  
+
   useEffect(() => {
     const fetchListings = async () => {
       try {
@@ -245,13 +245,13 @@ export default function ListingsPage() {
     if (isAuthenticated && user?.role === "student") {
       const fetchFavorites = async () => {
         try {
-            const res = await fetch("/api/favorites");
-            const data = await res.json();
-            if (data.success) {
-                setFavorites(data.favorites.map((fav: IListing) => fav._id));
-            }
+          const res = await fetch("/api/favorites");
+          const data = await res.json();
+          if (data.success) {
+            setFavorites(data.favorites.map((fav: IListing) => fav._id));
+          }
         } catch (error) {
-            console.error("Failed to fetch favorites:", error)
+          console.error("Failed to fetch favorites:", error);
         }
       };
       fetchFavorites();
@@ -266,12 +266,10 @@ export default function ListingsPage() {
 
     const isFavorited = favorites.includes(listingId);
 
-    // Optimistic UI update for a responsive feel
     setFavorites((prev) =>
       isFavorited ? prev.filter((id) => id !== listingId) : [...prev, listingId]
     );
 
-    // API call to sync with the backend
     try {
       await fetch("/api/favorites", {
         method: isFavorited ? "DELETE" : "POST",
@@ -280,7 +278,6 @@ export default function ListingsPage() {
       });
     } catch (error) {
       console.error("Failed to update favorite status:", error);
-      // If the API call fails, revert the change in the UI
       setFavorites((prev) =>
         isFavorited
           ? [...prev, listingId]
@@ -288,8 +285,7 @@ export default function ListingsPage() {
       );
     }
   };
-  
-  // All filter handler functions (unchanged)
+
   const handlePendingFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setPendingFilters((prev) => {
@@ -338,7 +334,6 @@ export default function ListingsPage() {
     setFilters(initialFilters);
   };
 
-  // useMemo for filtering logic (unchanged)
   const filteredListings = useMemo(() => {
     const selectedTypes = Object.entries(filters.types)
       .filter(([, checked]) => checked)
@@ -363,7 +358,7 @@ export default function ListingsPage() {
       const bedsMatch =
         filters.bedsPerRoom.length === 0 ||
         ((item.listingType === "PG" || item.listingType === "Hostel") &&
-          filters.bedsPerRoom.includes(item.bedsPerRoom || ""));
+          filters.bedsPerRoom.includes(String(item.bedsPerRoom || "")));
 
       return (
         typeMatch &&
@@ -376,7 +371,6 @@ export default function ListingsPage() {
     });
   }, [filters, allListings]);
 
-  // Main return JSX (unchanged, but now the favorite button will work correctly)
   return (
     <main className="bg-neutral-50 min-h-screen">
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
@@ -442,9 +436,7 @@ export default function ListingsPage() {
                           <Heart
                             size={20}
                             fill={
-                              favorites.includes(item._id)
-                                ? "#ef4444"
-                                : "none"
+                              favorites.includes(item._id) ? "#ef4444" : "none"
                             }
                             strokeWidth={1.5}
                           />
@@ -456,10 +448,7 @@ export default function ListingsPage() {
                         {item.title}
                       </h2>
                       <p className="flex items-center text-neutral-500 text-sm mt-1">
-                        <MapPin
-                          size={14}
-                          className="mr-1.5 flex-shrink-0"
-                        />{" "}
+                        <MapPin size={14} className="mr-1.5 flex-shrink-0" />{" "}
                         {item.address.split(",").slice(0, 2).join(", ")}
                       </p>
                       <div className="flex items-baseline justify-between mt-4">

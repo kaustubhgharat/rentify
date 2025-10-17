@@ -11,12 +11,10 @@ interface Filters {
   maxRent: number;
 }
 
-// Define a simple type for the favorite object
 interface Favorite {
   _id: string;
 }
 
-// Define the shape of the entire API response for favorites
 interface FavoritesApiResponse {
   success: boolean;
   favorites: Favorite[];
@@ -26,7 +24,10 @@ export default function ListingsPage() {
   const [listings, setListings] = useState<IRoommatePost[]>([]);
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState<Filters>({ address: "", maxRent: 50000 });
+  const [filters, setFilters] = useState<Filters>({
+    address: "",
+    maxRent: 50000,
+  });
 
   useEffect(() => {
     async function fetchData() {
@@ -37,20 +38,17 @@ export default function ListingsPage() {
         ]);
 
         if (!listingsRes.ok) throw new Error("Failed to fetch listings");
-        
+
         const listingsData = await listingsRes.json();
         setListings(listingsData.listings || []);
-        
-        if (favoritesRes.ok) {
-            // Apply the new interface to the JSON response
-            const favoritesData: FavoritesApiResponse = await favoritesRes.json();
-            if (favoritesData.success && Array.isArray(favoritesData.favorites)) {
-                // Now TypeScript knows favorites is an array of Favorite objects
-                const ids = new Set(favoritesData.favorites.map((fav) => fav._id));
-                setFavoriteIds(ids); // This is now correctly a Set<string>
-            }
-        }
 
+        if (favoritesRes.ok) {
+          const favoritesData: FavoritesApiResponse = await favoritesRes.json();
+          if (favoritesData.success && Array.isArray(favoritesData.favorites)) {
+            const ids = new Set(favoritesData.favorites.map((fav) => fav._id));
+            setFavoriteIds(ids); 
+          }
+        }
       } catch (err) {
         console.error("Failed to fetch data:", err);
       } finally {
@@ -84,7 +82,9 @@ export default function ListingsPage() {
     return (
       <div className="flex justify-center items-center min-h-screen bg-slate-50">
         <div className="text-center">
-          <p className="text-lg text-slate-500">Finding potential roommates...</p>
+          <p className="text-lg text-slate-500">
+            Finding potential roommates...
+          </p>
         </div>
       </div>
     );
@@ -176,4 +176,3 @@ export default function ListingsPage() {
     </main>
   );
 }
-

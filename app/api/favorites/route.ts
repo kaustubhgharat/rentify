@@ -6,7 +6,7 @@ import { cookies } from 'next/headers';
 
 export const getUserIdFromToken = async (request: NextRequest): Promise<string | null> => {
   try {
-    const cookieStore = await cookies(); // async call
+    const cookieStore = await cookies(); 
     const token = cookieStore.get("token")?.value;
     if (!token) return null;
 
@@ -18,10 +18,9 @@ export const getUserIdFromToken = async (request: NextRequest): Promise<string |
   }
 };
 
-// GET the user's favorited listings
 export async function GET(request: NextRequest) {
     await connectDB();
-    const userId = await getUserIdFromToken(request); // ✅ await here
+    const userId = await getUserIdFromToken(request);
     if (!userId) return NextResponse.json({ success: false, error: "Not authenticated" }, { status: 401 });
 
     const user = await User.findById(userId).populate('favorites');
@@ -30,10 +29,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: true, favorites: user.favorites });
 }
 
-// POST to add a listing to favorites
+
 export async function POST(request: NextRequest) {
     await connectDB();
-    const userId = await getUserIdFromToken(request); // ✅ await here
+    const userId = await getUserIdFromToken(request); 
     if (!userId) return NextResponse.json({ success: false, error: "Not authenticated" }, { status: 401 });
     
     const { listingId } = await request.json();
@@ -44,10 +43,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, message: "Added to favorites" });
 }
 
-// DELETE to remove a listing from favorites
+
 export async function DELETE(request: NextRequest) {
     await connectDB();
-    const userId = await getUserIdFromToken(request); // ✅ await here
+    const userId = await getUserIdFromToken(request); 
     if (!userId) return NextResponse.json({ success: false, error: "Not authenticated" }, { status: 401 });
 
     const { listingId } = await request.json();

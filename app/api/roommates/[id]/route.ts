@@ -3,7 +3,6 @@ import dbConnect from '@/app/lib/mongoose'
 import Roommate from '@/app/models/Roommate'
 import { getUserIdFromRequest } from "@/app/lib/auth";
 
-// GET a single post by its ID
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     await dbConnect();
@@ -20,7 +19,6 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-// DELETE a post by its ID
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const userId = getUserIdFromRequest(request);
@@ -35,7 +33,6 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       return NextResponse.json({ success: false, error: "Post not found" }, { status: 404 });
     }
 
-    // SECURITY CHECK: Ensure the user deleting the post is the one who created it
     if (post.userId.toString() !== userId) {
       return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
     }
@@ -50,7 +47,6 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
   }
 }
 
-// UPDATE a post by its ID
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const userId = getUserIdFromRequest(request);
@@ -65,7 +61,6 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ success: false, error: "Post not found" }, { status: 404 });
     }
 
-    // SECURITY CHECK: Ensure the user updating the post is the one who created it
     if (post.userId.toString() !== userId) {
       return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
     }
@@ -73,7 +68,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     const updatedData = await request.json();
     
     post = await Roommate.findByIdAndUpdate(params.id, updatedData, {
-      new: true, // Return the updated document
+      new: true, 
       runValidators: true,
     });
 

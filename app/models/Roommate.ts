@@ -1,38 +1,44 @@
-import { Schema, model, models } from 'mongoose';
+import { Schema, model, models } from "mongoose";
 
-const amenitiesSchema = new Schema({
-  wifi: { type: Boolean, default: false },
-  ac: { type: Boolean, default: false },
-  food: { type: Boolean, default: false },
-  parking: { type: Boolean, default: false },
-  bed: { type: Boolean, default: false },
-  table: { type: Boolean, default: false },
-  washingMachine: { type: Boolean, default: false },
-}, { _id: false });
+const amenitiesSchema = new Schema(
+  {
+    wifi: { type: Boolean, default: false },
+    ac: { type: Boolean, default: false },
+    food: { type: Boolean, default: false },
+    parking: { type: Boolean, default: false },
+    bed: { type: Boolean, default: false },
+    table: { type: Boolean, default: false },
+    washingMachine: { type: Boolean, default: false },
+  },
+  { _id: false }
+);
 
-const contactSchema = new Schema({
-  name: { type: String, required: true },
-  phone: { type: String, required: true },
-  email: { type: String },
-}, { _id: false });
+const contactSchema = new Schema(
+  {
+    name: { type: String, required: true },
+    phone: { type: String, required: true },
+    email: { type: String },
+  },
+  { _id: false }
+);
 
 const roommateSchema = new Schema({
   title: {
     type: String,
-    required: [true, 'Title is required.'],
+    required: [true, "Title is required."],
   },
   listingType: {
     type: String,
-    enum: ['Flat', 'PG'],
+    enum: ["Flat", "PG"],
     required: true,
   },
   gender: {
     type: String,
-    enum: ['Male', 'Female', 'Any'],
+    enum: ["Male", "Female", "Any"],
   },
   address: {
     type: String,
-    required: [true, 'Address is required.'],
+    required: [true, "Address is required."],
   },
   latitude: Number,
   longitude: Number,
@@ -49,7 +55,7 @@ const roommateSchema = new Schema({
   },
   furnishing: {
     type: String,
-    enum: ['Furnished', 'Semi-Furnished', 'Unfurnished'],
+    enum: ["Furnished", "Semi-Furnished", "Unfurnished"],
     required: true,
   },
   description: {
@@ -64,13 +70,11 @@ const roommateSchema = new Schema({
   contact: contactSchema,
   userId: {
     type: Schema.Types.ObjectId,
-    ref: 'User', // This should match the name of your User model
+    ref: "User", 
     required: true,
-  }
- 
+  },
 });
 
-// Using the name 'Roommate' will create a 'roommates' collection in MongoDB
-const Roommate = models.Roommate || model('Roommate', roommateSchema);
+const Roommate = models.Roommate || model("Roommate", roommateSchema);
 
 export default Roommate;

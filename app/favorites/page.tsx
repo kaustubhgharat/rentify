@@ -5,11 +5,10 @@ import Link from "next/link";
 import { Heart, MapPin, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useAuth } from "@/app/context/AuthContext";
-import { IListing, IRoommatePost } from "@/app/types"; // Import IRoommatePost
+import { IListing, IRoommatePost } from "@/app/types"; 
 import { useRouter } from "next/navigation";
-import ListingCard from "@/app/components/RoommatePostCard"; // Import the correct card
+import ListingCard from "@/app/components/RoommatePostCard"; 
 
-// --- Tabs Helper Components (No changes here) ---
 const TabsContext = createContext<{
   activeTab: string;
   setActiveTab: (value: string) => void;
@@ -55,12 +54,10 @@ const TabsContent = ({ value, children, ...props }: TabsContentProps) => {
   return activeTab === value ? <div {...props}>{children}</div> : null;
 };
 
-// --- Favorites Page Component ---
 export default function FavoritesPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const [favoriteListings, setFavoriteListings] = useState<IListing[]>([]);
-  // Use the correct type for roommate posts
   const [favoriteRoommates, setFavoriteRoommates] = useState<IRoommatePost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("listings");
@@ -102,9 +99,7 @@ export default function FavoritesPage() {
     }
   }, [user, authLoading, router]);
   
-  // This function will be called by the ListingCard component
   const handleFavoriteToggle = (listingId: string, isNowFavorite: boolean) => {
-      // If the item is no longer a favorite, remove it from the state
       if (!isNowFavorite) {
           setFavoriteRoommates((prev) => 
               prev.filter((roommate) => roommate._id.toString() !== listingId)
@@ -112,12 +107,10 @@ export default function FavoritesPage() {
       }
   };
 
-  // This function handles unfavoriting property listings
   const handleUnfavoriteListing = async (listingId: string) => {
     setFavoriteListings((prev) =>
       prev.filter((listing) => listing._id !== listingId)
     );
-    // The API call still happens in the background to update the database
     await fetch("/api/favorites", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
@@ -226,15 +219,12 @@ export default function FavoritesPage() {
                 </Link>
               </div>
             ) : (
-              // Use the ListingCard component for a consistent UI
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {favoriteRoommates.map((roommate) => (
                   <ListingCard
                     key={roommate._id.toString()}
                     listing={roommate}
-                    // Since these are on the favorites page, they are always favorited initially
                     initialIsFavorite={true}
-                    // Pass the handler function to the card
                     onFavoriteToggle={handleFavoriteToggle}
                   />
                 ))}

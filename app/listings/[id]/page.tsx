@@ -137,7 +137,6 @@ export default async function ListingDetailPage({
                       </p>
                     </div>
                   )}
-                {/* Conditionally render gender only if it's not 'Any' */}
                 {listing.gender && listing.gender !== "Any" && (
                   <div className="flex items-center gap-2">
                     <Users size={18} className="text-teal-600" />
@@ -216,7 +215,6 @@ export default async function ListingDetailPage({
                     ₹{listing.deposit.toLocaleString()}
                   </span>
                 </div>
-                {/* ✨ THIS IS THE FIX ✨ */}
                 {listing.maintenance != null && (
                   <div className="flex justify-between items-center text-sm text-neutral-600">
                     <span className="flex items-center gap-2">

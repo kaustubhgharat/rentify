@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { IRoommatePost } from "@/app/types";
 import { PlusCircle, Loader, AlertCircle } from "lucide-react";
-import ListingCard from "@/app/components/RoommatePostCard"; // <-- IMPORT THE NEW COMPONENT
+import ListingCard from "@/app/components/RoommatePostCard"; 
 
 export default function MyPostsPage() {
   const [posts, setPosts] = useState<IRoommatePost[]>([]);
@@ -13,7 +13,6 @@ export default function MyPostsPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // ... (your fetchMyPosts function remains the same)
     const fetchMyPosts = async () => {
       try {
         setLoading(true);
@@ -102,7 +101,6 @@ export default function MyPostsPage() {
             {posts.map((listing) => {
               const listingId = typeof listing._id === "string" ? listing._id : listing._id.toString();
               return (
-                //  ▼▼▼ USE THE NEW COMPONENT HERE ▼▼▼
                 <ListingCard
                   key={listingId}
                   listing={listing}

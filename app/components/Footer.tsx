@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { Mail, Phone, Twitter, Instagram, Facebook, Heart, Building } from "lucide-react";
-import { useAuth } from "@/app/context/AuthContext"; // Import the auth hook
+import { useAuth } from "@/app/context/AuthContext"; 
 
 export default function Footer() {
-  const { user, isAuthenticated } = useAuth(); // Get user session data
+  const { user, isAuthenticated } = useAuth(); 
 
   return (
     <footer className="bg-slate-800 text-slate-400">
@@ -27,7 +27,6 @@ export default function Footer() {
             <ul className="mt-4 space-y-3">
               <li><Link href="/listings" className="hover:text-teal-400 transition-all transform hover:translate-x-1 block">Find a Room</Link></li>
               <li><Link href="/roommates" className="hover:text-teal-400 transition-all transform hover:translate-x-1 block">Find Roommates</Link></li>
-              {/* ✨ Show "Add Listing" only to authenticated owners */}
               {isAuthenticated && user?.role === 'owner' && (
                   <li>
                     <Link href="/listings/add" className="flex items-center gap-2 hover:text-teal-400 transition-all transform hover:translate-x-1">
@@ -61,7 +60,6 @@ export default function Footer() {
                 <span>+91 98765 43210</span>
               </li>
             </ul>
-            {/* ✨ Stylized social media icons */}
             <div className="flex space-x-4 mt-6">
               <a href="#" className="p-2 bg-slate-700 rounded-full hover:bg-teal-600 hover:text-white transition-colors"><Twitter size={18} /></a>
               <a href="#" className="p-2 bg-slate-700 rounded-full hover:bg-teal-600 hover:text-white transition-colors"><Facebook size={18} /></a>

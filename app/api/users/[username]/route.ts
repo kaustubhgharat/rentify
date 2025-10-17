@@ -8,8 +8,6 @@ export async function GET(request: NextRequest, { params }: { params: { username
   try {
     await connectDB();
     const { username } = params;
-
-    // Find user by username, but exclude the password field for security
     const user = await User.findOne({ username }).select('-password');
 
     if (!user) {

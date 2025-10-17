@@ -5,7 +5,6 @@ import User from "../../models/User";
 import connectDB from "../../lib/mongoose";
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
-import Roommate from "../../models/Roommate"; // make sure this exists
 
 export const getUserIdFromToken = async (request: NextRequest): Promise<string | null> => {
   try {
@@ -21,7 +20,6 @@ export const getUserIdFromToken = async (request: NextRequest): Promise<string |
   }
 };
 
-// GET the user's favorited roommates
 export async function GET(request: NextRequest) {
   await connectDB();
   const userId = await getUserIdFromToken(request);
@@ -33,7 +31,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({ success: true, favorites: user.favoriteRoommates });
 }
 
-// POST to add a roommate to favorites
+
 export async function POST(request: NextRequest) {
   await connectDB();
   const userId = await getUserIdFromToken(request);
@@ -46,7 +44,7 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({ success: true, message: "Added to favorites" });
 }
 
-// DELETE to remove a roommate from favorites
+
 export async function DELETE(request: NextRequest) {
   await connectDB();
   const userId = await getUserIdFromToken(request);

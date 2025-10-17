@@ -7,7 +7,6 @@ export async function POST(request: NextRequest) {
     await connectDB();
     const { username, email, password, role } = await request.json();
 
-    // ✅ Required fields
     if (!username || !email || !password || !role) {
       return NextResponse.json(
         { success: false, error: "Please provide all required fields." },
@@ -15,8 +14,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // ✅ Stronger email validation
-    // This regex only allows real domain endings like .com, .in, .edu, .net, etc.
     const emailRegex =
       /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.(com|in|edu|net|org|co|gov|info|io|ai|ac\.in|co\.in)$/i;
 
@@ -27,7 +24,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // ✅ Check for common misspelled domains
     const domain = email.split("@")[1]?.toLowerCase();
     const typoDomains = ["gmial.com", "gamil.com", "gmal.com", "yaho.com", "hotmal.com"];
     if (typoDomains.includes(domain)) {
@@ -37,7 +33,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // ✅ Username and password validation
     if (username.trim().length < 3) {
       return NextResponse.json(
         { success: false, error: "Username must be at least 3 characters long." },
@@ -52,7 +47,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // ✅ Check for existing users
     const existingUserByEmail = await User.findOne({ email });
     if (existingUserByEmail) {
       return NextResponse.json(
@@ -69,7 +63,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // ✅ Create user
     const newUser = await User.create({ username, email, password, role });
 
     return NextResponse.json(

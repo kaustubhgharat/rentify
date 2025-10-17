@@ -26,17 +26,15 @@ import {
 import { Heart } from "lucide-react";
 import { useEffect, useState } from "react";
 
-// 1. UPDATE PROPS: Add a prop to receive the initial favorite status
 interface ListingCardProps {
   listing: IRoommatePost;
   showAdminControls?: boolean;
   onDelete?: (id: string) => void;
-  initialIsFavorite?: boolean; // This is the new prop
-  onFavoriteToggle?: (listingId: string, isNowFavorite: boolean) => void; // ✅ ADD THIS LINE
-  hideFavoriteButton?: boolean; // ✅ NEW
+  initialIsFavorite?: boolean;
+  onFavoriteToggle?: (listingId: string, isNowFavorite: boolean) => void;
+  hideFavoriteButton?: boolean; 
 }
 
-// A map of amenity keys to their corresponding icons
 const amenityIcons: { [key: string]: React.ReactNode } = {
   wifi: <Wifi size={18} />,
   ac: <Wind size={18} />,
@@ -51,18 +49,16 @@ export default function ListingCard({
   listing,
   showAdminControls = false,
   onDelete,
-  initialIsFavorite = false, // 2. Get the new prop
+  initialIsFavorite = false, 
   onFavoriteToggle,
-  hideFavoriteButton = false, // ✅ NEW
+  hideFavoriteButton = false, 
 }: ListingCardProps) {
   const listingId =
     typeof listing._id === "string" ? listing._id : listing._id.toString();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // 3. Initialize state using the prop, not just 'false'
   const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
 
-  // 4. ADD THIS EFFECT: This keeps the heart icon in sync if the prop ever changes.
   useEffect(() => {
     setIsFavorite(initialIsFavorite);
   }, [initialIsFavorite]);
@@ -70,8 +66,8 @@ export default function ListingCard({
   const toggleFavorite = async (e: React.MouseEvent) => {
     e.stopPropagation();
     const newFavoriteStatus = !isFavorite;
-    setIsFavorite(newFavoriteStatus); // Update UI immediately
-    onFavoriteToggle?.(listingId, newFavoriteStatus); // ✅ Notify parent
+    setIsFavorite(newFavoriteStatus); 
+    onFavoriteToggle?.(listingId, newFavoriteStatus); 
 
     const method = newFavoriteStatus ? "POST" : "DELETE";
 
@@ -83,18 +79,15 @@ export default function ListingCard({
       });
 
       if (!response.ok) {
-        // If the API call fails, revert the UI change
         setIsFavorite(!newFavoriteStatus);
         console.error("Failed to update favorite status on the server.");
       }
     } catch (error) {
-      // Also revert on network error
       setIsFavorite(!newFavoriteStatus);
       console.error("An error occurred while updating favorites:", error);
     }
   };
 
-  // Effect to handle body scroll when modal is open/closed
   useEffect(() => {
     if (isModalOpen) {
       document.body.style.overflow = "hidden";
@@ -130,22 +123,21 @@ export default function ListingCard({
       >
         <div className="relative h-56 w-full">
           {!hideFavoriteButton && (
-  <button
-    onClick={toggleFavorite}
-    className={`absolute top-4 left-4 z-10 p-2 rounded-full bg-white/90 backdrop-blur-md shadow-md hover:bg-white transition-colors ${
-      isFavorite ? "text-red-500" : "text-gray-700"
-    }`}
-    aria-label="Toggle Favorite"
-  >
-    <Heart
-      size={22}
-      strokeWidth={2}
-      fill={isFavorite ? "red" : "none"}
-      className="transition-transform duration-300"
-    />
-  </button>
-)}
-
+            <button
+              onClick={toggleFavorite}
+              className={`absolute top-4 left-4 z-10 p-2 rounded-full bg-white/90 backdrop-blur-md shadow-md hover:bg-white transition-colors ${
+                isFavorite ? "text-red-500" : "text-gray-700"
+              }`}
+              aria-label="Toggle Favorite"
+            >
+              <Heart
+                size={22}
+                strokeWidth={2}
+                fill={isFavorite ? "red" : "none"}
+                className="transition-transform duration-300"
+              />
+            </button>
+          )}
 
           <Image
             src={listing.imageUrls?.[0] || "/placeholder.png"}
@@ -259,7 +251,7 @@ export default function ListingCard({
               </a>
 
               <p className="text-slate-700 leading-relaxed text-base mt-4">
-                {listing.description} {/* Full description in modal */}
+                {listing.description}
               </p>
 
               <div className="space-y-3 border-t pt-4 mt-6">

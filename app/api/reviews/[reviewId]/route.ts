@@ -19,7 +19,6 @@ export async function DELETE(req: NextRequest, { params }: { params: { reviewId:
       return NextResponse.json({ message: 'Review not found.' }, { status: 404 });
     }
 
-    // Authorization: Ensure the user deleting is the one who created it
     if (review.user.toString() !== userId) {
       return NextResponse.json({ message: 'Not authorized.' }, { status: 403 });
     }

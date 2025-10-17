@@ -3,11 +3,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/app/context/AuthContext'; // Using your AuthContext
+import { useAuth } from '@/app/context/AuthContext';
 import toast from 'react-hot-toast';
 import { Trash2, Send } from 'lucide-react';
+import Image from 'next/image';
 
-// --- Type Definitions ---
 interface UserInfo {
   _id: string;
   username: string | null;
@@ -39,7 +39,6 @@ export function ListingReviews({ listingId }: { listingId: string }) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Form state
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -50,6 +49,7 @@ export function ListingReviews({ listingId }: { listingId: string }) {
         const res = await fetch(`/api/listings/${listingId}/reviews`);
         if (res.ok) setReviews(await res.json());
       } catch (error) {
+        
         toast.error('Could not load reviews.');
       } finally {
         setIsLoading(false);
@@ -75,8 +75,7 @@ export function ListingReviews({ listingId }: { listingId: string }) {
         throw new Error((await res.json()).message || 'Failed to submit review.');
       }
       const newReview = await res.json();
-      // This line works because the `newReview` object from the API
-      // now contains the populated `user` data, thanks to the backend fix.
+
       setReviews([newReview, ...reviews]);
       toast.success('Review submitted!');
       setRating(0);
@@ -133,11 +132,8 @@ export function ListingReviews({ listingId }: { listingId: string }) {
             <div key={review._id} className="p-4 border-b last:border-0">
               <div className="flex justify-between items-start">
                 <div className="flex items-center mb-2">
-                  {/* ✨ FIX: Conditional rendering for avatar/first letter */}
                   {review.user?.profilePhotoUrl ? (
-                    // If a profile photo exists, display it
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <Image
                       src={review.user.profilePhotoUrl}
                       alt={review.user.username || 'User'}
                       width={40}
@@ -145,7 +141,6 @@ export function ListingReviews({ listingId }: { listingId: string }) {
                       className="w-10 h-10 rounded-full mr-4 object-cover border-2 border-neutral-200"
                     />
                   ) : (
-                    // If no profile photo, display the first letter
                     <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center mr-4 border-2 border-teal-200">
                       <span className="text-lg font-bold text-teal-700">
                         {review.user?.username ? review.user.username.charAt(0).toUpperCase() : 'U'}
@@ -157,8 +152,6 @@ export function ListingReviews({ listingId }: { listingId: string }) {
                     <p className="text-sm text-neutral-500">{new Date(review.createdAt).toLocaleDateString()}</p>
                   </div>
                 </div>
-                {/* ✅ THIS IS THE FINAL FIX FOR THE DELETE BUTTON ✅ */}
-                {/* We now compare user._id with review.user._id */}
                 {user?._id === review.user._id && (
                   <button onClick={() => handleDelete(review._id)} className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-100">
                     <Trash2 size={18} />

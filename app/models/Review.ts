@@ -1,8 +1,8 @@
 // models/Review.ts
 
 import { Schema, model, models, Model, Document } from 'mongoose';
-import './User'; // Ensure User model is registered before referencing
-import './Listing'; // Ensure Listing model is registered before referencing
+import './User'; 
+import './Listing';
 
 export interface IReview extends Document {
   rating: number;
@@ -20,7 +20,6 @@ const ReviewSchema = new Schema<IReview>({
   listing: { type: Schema.Types.ObjectId, ref: 'Listing', required: true },
 });
 
-// A user can only review the same listing once
 ReviewSchema.index({ user: 1, listing: 1 }, { unique: true });
 
 const Review: Model<IReview> = models.Review || model<IReview>('Review', ReviewSchema);

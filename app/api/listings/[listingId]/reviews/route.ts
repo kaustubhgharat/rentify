@@ -1,7 +1,7 @@
 // app/api/listings/[listingId]/reviews/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getUserIdFromRequest } from '@/app/lib/auth'; // Your custom auth helper
+import { getUserIdFromRequest } from '@/app/lib/auth'; 
 import dbConnect from '@/app/lib/mongoose';
 import Review from '@/app/models/Review';
 import Listing from '@/app/models/Listing';
@@ -11,7 +11,7 @@ export async function GET(req: NextRequest, { params }: { params: { listingId: s
   try {
     await dbConnect();
     const reviews = await Review.find({ listing: params.listingId })
-      .populate({ path: 'user', model: User, select: 'username image' }) // Use 'image' if you have it, or 'profilePhotoUrl'
+      .populate({ path: 'user', model: User, select: 'username image' }) 
       .sort({ createdAt: -1 });
 
     return NextResponse.json(reviews, { status: 200 });
@@ -19,7 +19,7 @@ export async function GET(req: NextRequest, { params }: { params: { listingId: s
     return NextResponse.json({ message: 'Failed to fetch reviews.' }, { status: 500 });
   }
 }
-// === CREATE A NEW REVIEW (POST) ===
+
 export async function POST(req: NextRequest, { params }: { params: { listingId: string } }) {
   const userId = getUserIdFromRequest(req);
   if (!userId) {
@@ -46,8 +46,6 @@ export async function POST(req: NextRequest, { params }: { params: { listingId: 
     const newReview = await Review.create({ rating, comment, user: userId, listing: params.listingId });
     await Listing.findByIdAndUpdate(params.listingId, { $push: { reviews: newReview._id } });
 
-    // ✨ CRUCIAL FIX: Populate the 'user' field before sending the response ✨
-    // This adds the user's name and image to the JSON object sent to the frontend.
     await newReview.populate({
       path: 'user',
       model: User,

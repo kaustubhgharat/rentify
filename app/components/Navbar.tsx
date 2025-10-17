@@ -5,12 +5,26 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, LogOut } from "lucide-react";
 import { useAuth } from "@/app/context/AuthContext";
+import Image from "next/image";
 
-const NavLink = ({ href, children }: { href: string; children: React.ReactNode; }) => {
+const NavLink = ({
+  href,
+  children,
+}: {
+  href: string;
+  children: React.ReactNode;
+}) => {
   const pathname = usePathname();
   const isActive = pathname === href;
   return (
-    <Link href={href} className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive ? "bg-teal-50 text-teal-600 font-semibold" : "text-neutral-700 hover:bg-neutral-100 hover:text-teal-600"}`}>
+    <Link
+      href={href}
+      className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+        isActive
+          ? "bg-teal-50 text-teal-600 font-semibold"
+          : "text-neutral-700 hover:bg-neutral-100 hover:text-teal-600"
+      }`}
+    >
       {children}
     </Link>
   );
@@ -27,10 +41,6 @@ const NavLinksSkeleton = () => (
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const { user, isAuthenticated, loading, logout } = useAuth();
-
-  // *** REMOVED ***
-  // The localStorage listener is no longer needed. The component will automatically
-  // re-render whenever the `user` object in AuthContext changes.
 
   const allNavLinks = [
     { href: "/listings", label: "Find Room", roles: ["student", "owner"] },
@@ -76,8 +86,7 @@ export default function Navbar() {
                   className="flex items-center gap-3 text-sm font-semibold text-neutral-700 hover:text-teal-600"
                 >
                   {user.profilePhotoUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <Image
                       src={user.profilePhotoUrl}
                       alt="Profile"
                       className="w-9 h-9 rounded-full object-cover border-2 border-teal-500"
@@ -99,10 +108,16 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <Link href="/signin" className="px-4 py-2 text-sm font-medium text-neutral-700 hover:text-teal-600">
+                <Link
+                  href="/signin"
+                  className="px-4 py-2 text-sm font-medium text-neutral-700 hover:text-teal-600"
+                >
                   Sign In
                 </Link>
-                <Link href="/signup" className="px-4 py-2 text-sm font-medium text-white bg-teal-600 rounded-full hover:bg-teal-700 transition">
+                <Link
+                  href="/signup"
+                  className="px-4 py-2 text-sm font-medium text-white bg-teal-600 rounded-full hover:bg-teal-700 transition"
+                >
                   Sign Up
                 </Link>
               </>
@@ -128,7 +143,12 @@ export default function Navbar() {
             </div>
           ) : (
             visibleLinks.map((link) => (
-              <Link key={link.href} href={link.href} onClick={() => setIsOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium">
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setIsOpen(false)}
+                className="block px-3 py-2 rounded-md text-base font-medium"
+              >
                 {link.label}
               </Link>
             ))
@@ -150,10 +170,18 @@ export default function Navbar() {
               </button>
             ) : (
               <>
-                <Link href="/signin" onClick={() => setIsOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium">
+                <Link
+                  href="/signin"
+                  onClick={() => setIsOpen(false)}
+                  className="block px-3 py-2 rounded-md text-base font-medium"
+                >
                   Sign In
                 </Link>
-                <Link href="/signup" onClick={() => setIsOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium">
+                <Link
+                  href="/signup"
+                  onClick={() => setIsOpen(false)}
+                  className="block px-3 py-2 rounded-md text-base font-medium"
+                >
                   Sign Up
                 </Link>
               </>

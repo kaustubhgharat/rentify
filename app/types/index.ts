@@ -2,10 +2,10 @@
 import { ObjectId } from "mongodb";
 
 export interface IRoommatePost {
-  _id: ObjectId | string; // Can be ObjectId from DB or string
+  _id: ObjectId | string; 
   title: string;
   listingType: "Flat" | "PG";
-  bhkType?: string;      // Add this optional field
+  bhkType?: string;      
   bedsPerRoom?: string;  
   gender?: "Male" | "Female" | "Any";
   address: string;
@@ -25,7 +25,7 @@ export interface IRoommatePost {
     table: boolean;
     washingMachine: boolean;
   };
-  imageUrls: string[]; // URLs from Cloudinary
+  imageUrls: string[]; 
   contact: {
     name: string;
     phone: string;
@@ -34,13 +34,12 @@ export interface IRoommatePost {
   createdAt: string;
 }
 
-// This type will be used across your frontend pages
 export interface IListing {
   _id: string;
   title: string;
   listingType: 'PG' | 'Flat' | 'Hostel';
-  bhkType?: string;      // Add this optional field
-  bedsPerRoom?: number;  // Add this optional field
+  bhkType?: string;     
+  bedsPerRoom?: number;  
   availableBeds?:number;
   gender?: "Male" | "Female" | "Any";
   address: string;

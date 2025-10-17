@@ -18,7 +18,7 @@ export default function MyListingsPage() {
   useEffect(() => {
     if (!authLoading) {
       if (!authUser || authUser.role !== "owner") {
-        router.push("/"); // Redirect if not an owner
+        router.push("/"); 
         return;
       }
 

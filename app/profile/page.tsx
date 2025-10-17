@@ -13,11 +13,11 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
-import { useAuth } from "@/app/context/AuthContext"; // Corrected the import path
-
+import { useAuth } from "@/app/context/AuthContext";
+import Image from "next/image";
 
 export default function ProfilePage() {
-  const { user: authUser, setUser, loading: authLoading } = useAuth(); // Use the user and setUser from AuthContext
+  const { user: authUser, setUser, loading: authLoading } = useAuth();
 
   const [isEditing, setIsEditing] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -33,7 +33,6 @@ export default function ProfilePage() {
   const [formError, setFormError] = useState("");
   const [isSubmittingProfile, setIsSubmittingProfile] = useState(false);
 
-  // Separate state for password form
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
@@ -48,7 +47,6 @@ export default function ProfilePage() {
     confirm: false,
   });
 
-  // When the user data from context loads, populate the form
   useEffect(() => {
     if (authUser) {
       setFormData({
@@ -62,14 +60,12 @@ export default function ProfilePage() {
     }
   }, [authUser]);
 
-  // Redirect if not authenticated
   useEffect(() => {
     if (!authLoading && !authUser) {
       window.location.href = "/signin";
     }
   }, [authUser, authLoading]);
 
-  // Timeout for success messages
   useEffect(() => {
     if (successMessage || passwordSuccess) {
       const timer = setTimeout(() => {
@@ -86,7 +82,6 @@ export default function ProfilePage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Handles converting the selected image file to a Base64 string for preview
   const handlePhotoChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -97,7 +92,7 @@ export default function ProfilePage() {
       reader.readAsDataURL(file);
     }
   };
-  
+
   const handlePasswordInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setPasswordData({ ...passwordData, [e.target.name]: e.target.value });
   };
@@ -119,15 +114,11 @@ export default function ProfilePage() {
       if (!res.ok || !data.success) {
         throw new Error(data.error || "Failed to update profile");
       }
-      
-      // *** CORRECTED LOGIC ***
-      // 1. Update the AuthContext with the new user data.
-      // This will make the changes visible instantly across the entire app (like the Navbar).
+
       setUser(data.user);
 
       setSuccessMessage("Profile updated successfully!");
       setIsEditing(false);
-
     } catch (err) {
       setFormError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
@@ -163,12 +154,17 @@ export default function ProfilePage() {
       if (!res.ok || !data.success) {
         throw new Error(data.error || "Something went wrong");
       }
-      
-      setPasswordSuccess(data.message || "Password updated successfully!");
-      setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
 
+      setPasswordSuccess(data.message || "Password updated successfully!");
+      setPasswordData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
     } catch (error) {
-      setPasswordError(error instanceof Error ? error.message : "An unknown error occurred");
+      setPasswordError(
+        error instanceof Error ? error.message : "An unknown error occurred"
+      );
     } finally {
       setIsSubmittingPassword(false);
     }
@@ -195,10 +191,11 @@ export default function ProfilePage() {
           <div className="flex flex-col md:flex-row items-center gap-8">
             <div className="relative group">
               {formData.profilePhotoUrl ? (
-                 // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <Image
                   src={formData.profilePhotoUrl}
                   alt="Profile"
+                  width={128} 
+                  height={128}
                   className="w-32 h-32 rounded-full object-cover border-4 border-slate-200"
                 />
               ) : (
@@ -208,6 +205,7 @@ export default function ProfilePage() {
                   </span>
                 </div>
               )}
+
               {isEditing && (
                 <>
                   <label
@@ -223,10 +221,13 @@ export default function ProfilePage() {
                       onChange={handlePhotoChange}
                     />
                   </label>
+
                   {formData.profilePhotoUrl && (
                     <button
                       type="button"
-                      onClick={() => setFormData({ ...formData, profilePhotoUrl: "" })}
+                      onClick={() =>
+                        setFormData({ ...formData, profilePhotoUrl: "" })
+                      }
                       className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-red-600 text-white text-xs px-3 py-1 rounded-full shadow hover:bg-red-700"
                     >
                       Remove
@@ -256,26 +257,45 @@ export default function ProfilePage() {
                   />
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input
-                      type="email" name="email" value={formData.email} onChange={handleInputChange} placeholder="Email"
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      placeholder="Email"
                       className="w-full bg-slate-100 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
                     />
                     <input
-                      type="tel" name="phone" value={formData.phone} onChange={handleInputChange} placeholder="Phone Number"
+                      type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      placeholder="Phone Number"
                       className="w-full bg-slate-100 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
                     />
                     <input
-                      type="text" name="location" value={formData.location} onChange={handleInputChange} placeholder="Location (e.g., Pune)"
+                      type="text"
+                      name="location"
+                      value={formData.location}
+                      onChange={handleInputChange}
+                      placeholder="Location (e.g., Pune)"
                       className="w-full bg-slate-100 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
                     />
                   </div>
-                  {formError && (<p className="text-sm text-red-500">{formError}</p>)}
+                  {formError && (
+                    <p className="text-sm text-red-500">{formError}</p>
+                  )}
                   <div className="flex gap-4">
-                    <button type="submit" disabled={isSubmittingProfile}
+                    <button
+                      type="submit"
+                      disabled={isSubmittingProfile}
                       className="px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-semibold hover:bg-teal-700 disabled:bg-slate-400 flex items-center gap-2"
                     >
-                      <Save size={16} /> {isSubmittingProfile ? "Saving..." : "Save Profile"}
+                      <Save size={16} />{" "}
+                      {isSubmittingProfile ? "Saving..." : "Save Profile"}
                     </button>
-                    <button type="button" onClick={() => setIsEditing(false)}
+                    <button
+                      type="button"
+                      onClick={() => setIsEditing(false)}
                       className="px-4 py-2 bg-slate-200 text-slate-800 rounded-lg text-sm font-semibold hover:bg-slate-300"
                     >
                       Cancel
@@ -284,14 +304,34 @@ export default function ProfilePage() {
                 </form>
               ) : (
                 <div>
-                  <h1 className="text-4xl font-extrabold text-slate-900">{formData.username}</h1>
-                  <p className="text-slate-600 mt-2 max-w-lg">{formData.bio || "No bio provided."}</p>
+                  <h1 className="text-4xl font-extrabold text-slate-900">
+                    {formData.username}
+                  </h1>
+                  <p className="text-slate-600 mt-2 max-w-lg">
+                    {formData.bio || "No bio provided."}
+                  </p>
                   <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-slate-500">
-                    <span className="flex items-center gap-2"><Mail size={16} /> {formData.email}</span>
-                    {formData.phone && (<span className="flex items-center gap-2"><Phone size={16} /> {formData.phone}</span>)}
-                    {formData.location && (<span className="flex items-center gap-2"><MapPin size={16} /> {formData.location}</span>)}
+                    <span className="flex items-center gap-2">
+                      <Mail size={16} /> {formData.email}
+                    </span>
+                    {formData.phone && (
+                      <span className="flex items-center gap-2">
+                        <Phone size={16} /> {formData.phone}
+                      </span>
+                    )}
+                    {formData.location && (
+                      <span className="flex items-center gap-2">
+                        <MapPin size={16} /> {formData.location}
+                      </span>
+                    )}
                   </div>
-                  <span className={`mt-4 inline-block px-3 py-1 rounded-full text-xs font-semibold ${authUser.role === "owner" ? "bg-amber-100 text-amber-800" : "bg-sky-100 text-sky-800"}`}>
+                  <span
+                    className={`mt-4 inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+                      authUser.role === "owner"
+                        ? "bg-amber-100 text-amber-800"
+                        : "bg-sky-100 text-sky-800"
+                    }`}
+                  >
                     {authUser.role}
                   </span>
                 </div>
@@ -309,44 +349,93 @@ export default function ProfilePage() {
           )}
 
           <div className="mt-10 pt-8 border-t border-slate-200">
-            <h3 className="text-xl font-bold text-slate-800 mb-4">Security Settings</h3>
-            <form onSubmit={handlePasswordUpdate} className="space-y-4 max-w-sm">
+            <h3 className="text-xl font-bold text-slate-800 mb-4">
+              Security Settings
+            </h3>
+            <form
+              onSubmit={handlePasswordUpdate}
+              className="space-y-4 max-w-sm"
+            >
               <div className="relative">
                 <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                 <input
-                  type={showPassword.current ? "text" : "password"} name="currentPassword" placeholder="Current Password"
-                  value={passwordData.currentPassword} onChange={handlePasswordInputChange} required
+                  type={showPassword.current ? "text" : "password"}
+                  name="currentPassword"
+                  placeholder="Current Password"
+                  value={passwordData.currentPassword}
+                  onChange={handlePasswordInputChange}
+                  required
                   className="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                 />
-                <button type="button" onClick={() => setShowPassword((p) => ({ ...p, current: !p.current }))} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500">
-                  {showPassword.current ? <EyeOff size={18} /> : <Eye size={18} />}
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowPassword((p) => ({ ...p, current: !p.current }))
+                  }
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500"
+                >
+                  {showPassword.current ? (
+                    <EyeOff size={18} />
+                  ) : (
+                    <Eye size={18} />
+                  )}
                 </button>
               </div>
               <div className="relative">
                 <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                 <input
-                  type={showPassword.new ? "text" : "password"} name="newPassword" placeholder="New Password"
-                  value={passwordData.newPassword} onChange={handlePasswordInputChange} required
+                  type={showPassword.new ? "text" : "password"}
+                  name="newPassword"
+                  placeholder="New Password"
+                  value={passwordData.newPassword}
+                  onChange={handlePasswordInputChange}
+                  required
                   className="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                 />
-                <button type="button" onClick={() => setShowPassword((p) => ({ ...p, new: !p.new }))} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowPassword((p) => ({ ...p, new: !p.new }))
+                  }
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500"
+                >
                   {showPassword.new ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
               <div className="relative">
                 <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                 <input
-                  type={showPassword.confirm ? "text" : "password"} name="confirmPassword" placeholder="Confirm New Password"
-                  value={passwordData.confirmPassword} onChange={handlePasswordInputChange} required
+                  type={showPassword.confirm ? "text" : "password"}
+                  name="confirmPassword"
+                  placeholder="Confirm New Password"
+                  value={passwordData.confirmPassword}
+                  onChange={handlePasswordInputChange}
+                  required
                   className="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                 />
-                <button type="button" onClick={() => setShowPassword((p) => ({ ...p, confirm: !p.confirm }))} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500">
-                  {showPassword.confirm ? <EyeOff size={18} /> : <Eye size={18} />}
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowPassword((p) => ({ ...p, confirm: !p.confirm }))
+                  }
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500"
+                >
+                  {showPassword.confirm ? (
+                    <EyeOff size={18} />
+                  ) : (
+                    <Eye size={18} />
+                  )}
                 </button>
               </div>
-              {passwordError && (<p className="text-sm text-red-500">{passwordError}</p>)}
-              {passwordSuccess && (<p className="text-sm text-green-600">{passwordSuccess}</p>)}
-              <button type="submit" disabled={isSubmittingPassword}
+              {passwordError && (
+                <p className="text-sm text-red-500">{passwordError}</p>
+              )}
+              {passwordSuccess && (
+                <p className="text-sm text-green-600">{passwordSuccess}</p>
+              )}
+              <button
+                type="submit"
+                disabled={isSubmittingPassword}
                 className="px-4 py-2 bg-slate-700 text-white rounded-lg text-sm font-semibold hover:bg-slate-800 disabled:bg-slate-400"
               >
                 {isSubmittingPassword ? "Updating..." : "Update Password"}
@@ -358,4 +447,3 @@ export default function ProfilePage() {
     </main>
   );
 }
-

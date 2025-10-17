@@ -23,7 +23,7 @@ export const getUserIdFromToken = async (request: NextRequest): Promise<string |
 export async function PUT(request: NextRequest) {
   try {
     await connectDB();
-    const userId = await getUserIdFromToken(request); // ✅ FIXED: added await
+    const userId = await getUserIdFromToken(request); 
     if (!userId) {
       return NextResponse.json({ success: false, error: "Not authenticated" }, { status: 401 });
     }
@@ -50,7 +50,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ success: false, error: "Incorrect current password." }, { status: 401 });
     }
 
-    user.password = newPassword; // pre-save hook will hash this
+    user.password = newPassword; 
     await user.save();
 
     return NextResponse.json({ success: true, message: "Password updated successfully." });

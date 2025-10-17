@@ -4,7 +4,6 @@ import connectDB from "../../lib/mongoose";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 
-// Helper to get user ID from token (no changes needed)
 export const getUserIdFromToken = async (
   request: NextRequest
 ): Promise<string | null> => {
@@ -23,7 +22,6 @@ export const getUserIdFromToken = async (
   }
 };
 
-// GET current user's profile
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
@@ -50,9 +48,6 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// PUT (update) current user's profile
-// NO CHANGES ARE NEEDED HERE. It already accepts a string for the photo,
-// and a Base64 Data URL is a string.
 export async function PUT(request: NextRequest) {
   try {
     await connectDB();
@@ -64,7 +59,6 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Destructure all the new fields from the request body
     const { username, email, profilePhotoUrl, bio, phone, location } =
       await request.json();
 
@@ -78,7 +72,7 @@ export async function PUT(request: NextRequest) {
     const updateData = {
       username,
       email,
-      profilePhotoUrl: profilePhotoUrl ?? "", // allow empty string or base64
+      profilePhotoUrl: profilePhotoUrl ?? "", 
       bio: bio ?? "",
       phone: phone ?? "",
       location: location ?? "",
@@ -98,7 +92,6 @@ export async function PUT(request: NextRequest) {
     }
     return NextResponse.json({ success: true, user: updatedUser });
   } catch (error) {
-    // Handle potential duplicate key errors (e.g., if email is already taken)
     if (
       error instanceof Error &&
       "code" in error &&

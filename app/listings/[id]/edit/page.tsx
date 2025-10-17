@@ -32,21 +32,16 @@ const amenityOptions = [
 ] as const;
 
 export default function EditListingPage() {
-  // ✨ Get listing ID from the URL
   const params = useParams();
   const { id } = params;
-
-  // ✨ Form is initialized to null until data is fetched
   const [form, setForm] = useState<IListing | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
-  // Your Google Maps refs remain the same
   const mapRef = useRef<HTMLDivElement>(null);
   const autocompleteRef = useRef<HTMLInputElement>(null);
 
-  // ✨ useEffect to fetch the existing listing data
   useEffect(() => {
     if (!id) return;
     const fetchListingData = async () => {
@@ -57,7 +52,6 @@ export default function EditListingPage() {
         if (data.success) {
           setForm(data.listing);
         } else {
-          // Handle case where listing is not found
           alert("Listing not found.");
           router.push("/my-listings");
         }
@@ -70,7 +64,6 @@ export default function EditListingPage() {
     };
     fetchListingData();
   }, [id, router]);
-  // ✨ 2. New handler for when the marker is dragged on the map
 
   useEffect(() => {
     if (
@@ -105,9 +98,8 @@ export default function EditListingPage() {
       if (!place.geometry || !place.geometry.location) return;
       const location = place.geometry.location;
 
-      // ✨ FIX: Check if the previous state exists before updating
       setForm((prev) => {
-        if (!prev) return null; // Return null if prev is null
+        if (!prev) return null;
         return {
           ...prev,
           address: place.formatted_address || "",
@@ -125,9 +117,8 @@ export default function EditListingPage() {
       const pos = marker.getPosition();
       if (!pos) return;
 
-      // ✨ FIX: Apply the same check here
       setForm((prev) => {
-        if (!prev) return null; // Return null if prev is null
+        if (!prev) return null;
         return {
           ...prev,
           latitude: pos.lat(),
@@ -137,7 +128,6 @@ export default function EditListingPage() {
     });
   }, [form]);
 
-  // Your form handlers are mostly the same
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
@@ -158,7 +148,6 @@ export default function EditListingPage() {
     );
   };
 
-  // ✨ handleSubmit now sends a PUT request
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!form) return;
@@ -168,7 +157,7 @@ export default function EditListingPage() {
       const res = await fetch(`/api/listings/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form), // Send the updated form data as JSON
+        body: JSON.stringify(form),
       });
 
       const data = await res.json();
@@ -205,9 +194,6 @@ export default function EditListingPage() {
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-8">
-          {/* All form JSX is identical to your add-listing page */}
-          {/* The `value={form.fieldName}` attributes will automatically pre-fill the form */}
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label
@@ -279,7 +265,7 @@ export default function EditListingPage() {
               id="availableBeds"
               name="availableBeds"
               min={0}
-              max={form.bedsPerRoom || 0} // ✨ cannot exceed bedsPerRoom
+              max={form.bedsPerRoom || 0}
               required
               value={form.availableBeds || 0}
               onChange={(e) => {
@@ -288,7 +274,7 @@ export default function EditListingPage() {
                   prev
                     ? {
                         ...prev,
-                        availableBeds: Math.min(val, prev.bedsPerRoom??0),
+                        availableBeds: Math.min(val, prev.bedsPerRoom ?? 0),
                       }
                     : null
                 );
@@ -445,7 +431,6 @@ export default function EditListingPage() {
             </label>
             <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
               {amenityOptions.map(({ key, label, icon }) => (
-                // 3. ✨ THE BUTTON: Calls the toggleAmenity function when clicked.
                 <button
                   type="button"
                   key={key}
@@ -490,7 +475,6 @@ export default function EditListingPage() {
 
           {/* Owner Contact */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* ✨ Note: name attributes are now 'name', 'phone', 'email' to match the nested state handler */}
             <div>
               <label
                 htmlFor="contact-name"

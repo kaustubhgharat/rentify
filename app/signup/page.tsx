@@ -8,9 +8,10 @@ import {
   Lock,
   Mail,
   Building,
-  GraduationCap,Eye, EyeOff,
+  GraduationCap,
+  Eye,
+  EyeOff,
 } from "lucide-react";
-import { useAuth } from "@/app/context/AuthContext"; // ✨ 1. Import useAuth
 
 export default function SignUpPage() {
   const [username, setUsername] = useState("");
@@ -20,14 +21,12 @@ export default function SignUpPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
-
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
-    // ✨ ADDED: Validation for lowercase username and email
+
     if (/[A-Z]/.test(username)) {
       setError("Username must be in lowercase.");
       return;
@@ -37,7 +36,6 @@ export default function SignUpPage() {
       return;
     }
 
-    // ✅ Email syntax regex
     const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 
     if (username.trim().length < 3) {
@@ -50,17 +48,8 @@ export default function SignUpPage() {
       return;
     }
 
-    // ✅ Detect common domain typos
     const domain = email.split("@")[1]?.toLowerCase();
-    const commonDomains = [
-      "gmail.com",
-      "yahoo.com",
-      "outlook.com",
-      "hotmail.com",
-      "icloud.com",
-      "edu.in",
-      "ac.in",
-    ];
+
     const likelyTypos = [
       "gmial.com",
       "gamil.com",
@@ -79,7 +68,6 @@ export default function SignUpPage() {
       return;
     }
 
-    // Optional: Only allow realistic domain endings (no ".cmo" etc.)
     if (!/\.[a-z]{2,}$/i.test(domain)) {
       setError("Please enter a valid domain (e.g., .com, .in, .edu).");
       return;
@@ -102,13 +90,7 @@ export default function SignUpPage() {
       const data = await res.json();
       if (res.ok && data.success) {
         alert("Account created successfully!");
-        login(data.user);
-
-        if (data.user.role === "owner") {
-          router.push("/listings/add");
-        } else {
-          router.push("/listings");
-        }
+        router.push("/signin");
       } else {
         setError(data.error || "Something went wrong.");
       }
@@ -164,38 +146,34 @@ export default function SignUpPage() {
             </div>
           </div>
           <div>
-  <label className="block text-sm font-medium text-slate-700">
-    Password
-  </label>
-  <div className="relative mt-1">
-    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+            <label className="block text-sm font-medium text-slate-700">
+              Password
+            </label>
+            <div className="relative mt-1">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+              <input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg shadow-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition"
+              />
 
-    {/* 👇 Toggle visibility state */}
-    <input
-      type={showPassword ? "text" : "password"}
-      value={password}
-      onChange={(e) => setPassword(e.target.value)}
-      required
-      className="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg shadow-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition"
-    />
-
-    <button
+              <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
               >
-                {showPassword ? <EyeOff size={18}/> : <Eye size={18}/>}
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
-  </div>
-</div>
-
+            </div>
+          </div>
 
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
               I am a...
             </label>
             <div className="grid grid-cols-2 gap-4">
-              {/* Custom Radio Button for Student */}
               <div>
                 <input
                   type="radio"
@@ -214,7 +192,6 @@ export default function SignUpPage() {
                   <span className="font-semibold mt-2">Student</span>
                 </label>
               </div>
-              {/* Custom Radio Button for Owner */}
               <div>
                 <input
                   type="radio"

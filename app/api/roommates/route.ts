@@ -19,22 +19,18 @@ export const getUserIdFromToken = async (request: NextRequest): Promise<string |
     return null;
   }
 };
-// Configure Cloudinary with your credentials
-// It's best to use environment variables for this
 cloudinary.config({ 
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
   api_key: process.env.CLOUDINARY_API_KEY, 
   api_secret: process.env.CLOUDINARY_API_SECRET 
 });
 
-// Helper function to upload images
 async function uploadImagesToCloudinary(images: File[]): Promise<string[]> {
   const uploadPromises = images.map(async (image) => {
-    // Convert the image file to a buffer
+
     const bytes = await image.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Use a Promise to handle the stream-based upload
     return new Promise<string>((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         { resource_type: 'image' },
@@ -50,7 +46,6 @@ async function uploadImagesToCloudinary(images: File[]): Promise<string[]> {
     });
   });
 
-  // Wait for all uploads to complete
   return Promise.all(uploadPromises);
 }
 
@@ -70,7 +65,6 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    // 1. Authenticate the user and get their ID
     const userId = await getUserIdFromToken(request); // ✅ await here
     if (!userId) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
@@ -78,18 +72,13 @@ export async function POST(request: NextRequest) {
 
     await dbConnect();
 
-    // 2. Parse the multipart form data
     const formData = await request.formData();
     const images = formData.getAll('images') as File[];
     
     if (images.length === 0) {
       return NextResponse.json({ success: false, error: 'At least one image is required.' }, { status: 400 });
     }
-
-    // 3. Upload images to a cloud service like Cloudinary
     const imageUrls = await uploadImagesToCloudinary(images);
-
-    // 4. Create the new listing object with all data
     const newRoommateData = {
       title: formData.get('title'),
       listingType: formData.get('listingType'),
@@ -105,17 +94,15 @@ export async function POST(request: NextRequest) {
       amenities: JSON.parse(formData.get('amenities') as string),
       contact: JSON.parse(formData.get('contact') as string),
       imageUrls: imageUrls,
-      userId: userId, // 5. *** THIS IS THE FIX *** Add the user's ID
+      userId: userId, 
     };
 
-    // 6. Save the new listing to the database
     const roommate = await Roommate.create(newRoommateData);
 
     return NextResponse.json({ success: true, data: roommate }, { status: 201 });
 
-  }catch (error) { // FIX: Removed ': any'
+  }catch (error) { 
     console.error(error);
-    // Type-safe way to handle the error
     let errorMessage = 'Server Error';
     if (error instanceof Error) {
         errorMessage = error.message;

@@ -5,7 +5,6 @@ import jwt from 'jsonwebtoken';
 
 export const dynamic = "force-dynamic";
 
-// This async function is correct
 const getUser = async () => {
   try {
     const cookieStore = await cookies();
@@ -36,9 +35,7 @@ const features = [
   { icon: <HomeIcon className="h-8 w-8 text-teal-600" />, title: "Hyperlocal Focus", description: "All listings are from Katraj, Dhankawadi, and nearby student hubs." },
 ];
 
-// ✨ FIX 1: Make the Page Component async
 export default async function Home() {
-  // ✨ FIX 2: Await the result of the getUser function
   const user = await getUser();
 
   return (

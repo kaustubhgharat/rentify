@@ -23,7 +23,6 @@ export const getUserIdFromToken = async (
   }
 };
 
-// --- GET listing by ID ---
 export async function GET(
   request: NextRequest,
   { params }: { params: { listingId: string } }
@@ -57,7 +56,6 @@ export async function GET(
   }
 }
 
-// --- UPDATE a listing ---
 export async function PUT(
   request: NextRequest,
   { params }: { params: { listingId: string } }
@@ -98,7 +96,6 @@ export async function PUT(
 
     const updatedData = await request.json();
 
-    // Ensure availableBeds does not exceed bedsPerRoom
     if (updatedData.availableBeds > updatedData.bedsPerRoom) {
       updatedData.availableBeds = updatedData.bedsPerRoom;
     }
@@ -117,7 +114,6 @@ export async function PUT(
   }
 }
 
-// --- DELETE a listing ---
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { listingId: string } }

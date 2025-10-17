@@ -7,7 +7,7 @@ const amenitiesSchema = new Schema({
   parking: { type: Boolean, default: false },
   bed: { type: Boolean, default: false },
   table: { type: Boolean, default: false },
-    washingMachine: { type: Boolean, default: false }, // Added missing field from your form
+    washingMachine: { type: Boolean, default: false }, 
 
 }, { _id: false });
 
@@ -20,13 +20,13 @@ const contactSchema = new Schema({
 const listingSchema = new Schema({
   owner: {
     type: Schema.Types.ObjectId,
-    ref: 'User', // This creates a reference to the User model
+    ref: 'User', 
     required: true,
   },
   title: { type: String, required: [true, 'Title is required.'] },
   listingType: { type: String, enum: ['PG', 'Flat', 'Hostel'], required: true },
- bhkType: { type: String },      // For 'Flat' type
-  bedsPerRoom: { type: Number }, // total beds in a room
+ bhkType: { type: String },      
+  bedsPerRoom: { type: Number }, 
   availableBeds: { type: Number },
   gender: { type: String, enum: ['Male', 'Female', 'Any'] },
   address: { type: String, required: [true, 'Address is required.'] },
