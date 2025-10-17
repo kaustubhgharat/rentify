@@ -25,6 +25,15 @@ export default function SignUpPage() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
+    // ✨ ADDED: Validation for lowercase username and email
+    if (/[A-Z]/.test(username)) {
+      setError("Username must be in lowercase.");
+      return;
+    }
+    if (/[A-Z]/.test(email)) {
+      setError("Email must be in lowercase.");
+      return;
+    }
 
     // ✅ Email syntax regex
     const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
